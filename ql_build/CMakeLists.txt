@@ -38,8 +38,8 @@ set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <CMAKE_C_LINK_FLAGS> -o <TARGET> <OB
 
 ## 设置编译参数和连接参数 -marm -mcpu=arm968e-s -mthumb-interwork -nostdlib
 set(ASM_OPTIONS "-g -marm -mthumb-interwork -mcpu=arm968e-s -march=armv5te -x assembler-with-cpp")
-set(CMAKE_C_FLAGS "-g -DCFG_OS_FREERTOS=1 -DWIFI_BLE_COEXIST -mthumb -mcpu=arm968e-s -march=armv5te -mthumb-interwork -mlittle-endian -Os -std=c99 -ffunction-sections -Wall -Wno-format -Wno-unknown-pragmas -fsigned-char -fdata-sections -nostdlib -fno-strict-aliasing -fno-common")
-set(CMAKE_CXX_FLAGS "-g -DCFG_OS_FREERTOS=1 -DWIFI_BLE_COEXIST -mthumb -mcpu=arm968e-s -march=armv5te -mthumb-interwork -mlittle-endian -Os -std=c99 -ffunction-sections -Wall -Wno-format -Wno-unknown-pragmas -fsigned-char -fdata-sections -nostdlib -fno-strict-aliasing -fno-common")
+set(CMAKE_C_FLAGS "-g -DPIKA_CONFIG_ENABLE -DCFG_OS_FREERTOS=1 -DWIFI_BLE_COEXIST -mthumb -mcpu=arm968e-s -march=armv5te -mthumb-interwork -mlittle-endian -Os -std=c99 -ffunction-sections -Wall -Wno-format -Wno-unknown-pragmas -fsigned-char -fdata-sections -nostdlib -fno-strict-aliasing -fno-common")
+set(CMAKE_CXX_FLAGS "-g -DPIKA_CONFIG_ENABLE -DCFG_OS_FREERTOS=1 -DWIFI_BLE_COEXIST -mthumb -mcpu=arm968e-s -march=armv5te -mthumb-interwork -mlittle-endian -Os -std=c99 -ffunction-sections -Wall -Wno-format -Wno-unknown-pragmas -fsigned-char -fdata-sections -nostdlib -fno-strict-aliasing -fno-common")
 ###########################################################################
 project(fc41d VERSION 1.0)
 
@@ -80,6 +80,13 @@ list(APPEND include_files
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/5500/w5500
  
     # TODO: add user include file inc here,
+
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-api
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-core
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdDevice
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdLib
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/FC41D/
 
     ${CMAKE_CURRENT_LIST_DIR}/../ql_kernel/common
     ${CMAKE_CURRENT_LIST_DIR}/../ql_kernel/demo
@@ -270,8 +277,16 @@ list(APPEND kernel_app_source_file
     ${CMAKE_CURRENT_LIST_DIR}/../ql_kernel/demo/ieee802_11_demo.c
 )
 
+file (GLOB pika_src
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-api/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-core/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdDevice/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdLib/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/FC41D/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pika_config.c)
+
 list(APPEND quectel_demo_source_file
-    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/demo_main.c
+    # ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/demo_main.c
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_ble_demo.c
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_i2c_eeprom_demo.c
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_timer_demo.c
@@ -302,9 +317,9 @@ list(APPEND quectel_demo_source_file
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/5500/wizchip_test.c
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/5500/w5500/w5500.c
 
-
-
+    ${pika_src}
     # TODO: add user source files(s/c/c++) here:
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/app_main.c
 )
 
 list(APPEND mbedtls_source_file
