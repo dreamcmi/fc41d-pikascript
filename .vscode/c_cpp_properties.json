@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "FC41D",
+            "includePath": ["${workspaceFolder}/**"],
+            "defines": [],
+            "windowsSdkVersion": "10.0.19041.0",
+            "compilerPath": "${workspaceFolder}/ql_tools/toolchain/gcc_arm_none_eabi/gcc-arm-none-eabi-5_4-2016q3-win32/bin/arm-none-eabi-gcc.exe",
+            "cStandard": "c99",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "gcc-arm"
+        }
+    ],
+    "version": 4
+}

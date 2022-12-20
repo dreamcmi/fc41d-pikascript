@@ -1,0 +1,22 @@
+{
+    "C_Cpp.clang_format_style": "{ BasedOnStyle: Chromium, IndentWidth: 4}",
+    "files.associations": {
+        "include.h": "c",
+        "uart_pub.h": "c",
+        "stdio.h": "c",
+        "drv_model_pub.h": "c",
+        "ql_flash.h": "c",
+        "ql_gpio.h": "c",
+        "ql_timer.h": "c",
+        "ql_spi_flash.h": "c",
+        "ql_spi.h": "c",
+        "random": "c",
+        "arm_arch.h": "c",
+        "MEM_PUB.H": "cpp",
+        "pika_hal.h": "c",
+        "rtos_pub.h": "c",
+        "error.h": "c",
+        "ql_api_osi.h": "c",
+        "fc41d_time.h": "c"
+    }
+}
