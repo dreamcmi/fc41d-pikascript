@@ -29,29 +29,31 @@ else
     mkdir objs
 fi
 
-cp libble.a librf_use.a libuart_debug.a libcal.a librwnx.a librf_test.a libsensor.a objs
-cp libsupplicant.a objs
-cp ../driver/libdriver.a objs
-cp ../func/libfunc.a objs
-cp ../os/libos.a ../os/librtos.a objs
-cd objs
-arm-none-eabi-ar -x libble.a
-arm-none-eabi-ar -x libcal.a
-arm-none-eabi-ar -x librf_test.a
-arm-none-eabi-ar -x librf_use.a
-arm-none-eabi-ar -x librwnx.a
-arm-none-eabi-ar -x libsensor.a
-arm-none-eabi-ar -x libsupplicant.a
-arm-none-eabi-ar -x libuart_debug.a
-arm-none-eabi-ar -x libdriver.a
-arm-none-eabi-ar -x libfunc.a
-arm-none-eabi-ar -x libos.a
-arm-none-eabi-ar -x librtos.a
-arm-none-eabi-ar -rcs libsdk.a *.o
-cp libsdk.a ../
+cd ../../ql_build
+
+# cp libble.a librf_use.a libuart_debug.a libcal.a librwnx.a librf_test.a libsensor.a objs
+# cp libsupplicant.a objs
+# cp ../driver/libdriver.a objs
+# cp ../func/libfunc.a objs
+# cp ../os/libos.a ../os/librtos.a objs
+# cd objs
+# arm-none-eabi-ar -x libble.a
+# arm-none-eabi-ar -x libcal.a
+# arm-none-eabi-ar -x librf_test.a
+# arm-none-eabi-ar -x librf_use.a
+# arm-none-eabi-ar -x librwnx.a
+# arm-none-eabi-ar -x libsensor.a
+# arm-none-eabi-ar -x libsupplicant.a
+# arm-none-eabi-ar -x libuart_debug.a
+# arm-none-eabi-ar -x libdriver.a
+# arm-none-eabi-ar -x libfunc.a
+# arm-none-eabi-ar -x libos.a
+# arm-none-eabi-ar -x librtos.a
+# arm-none-eabi-ar -rcs libsdk.a *.o
+# cp libsdk.a ../
 
 
-cd ../../../ql_build
+# cd ../../../ql_build
 # make build dir to build project
 if [ ! -d "build" ]; then
     mkdir build
