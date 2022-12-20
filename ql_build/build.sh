@@ -68,16 +68,16 @@ cd ../../ql_out
 rm -fR *
 cd -
 echo "cmake build ......"
-cmake ..
+cmake -G Ninja ..
 echo "make build ......"
-make > ../../ql_out/build_log.txt # 2> ../../ql_out/build_error_log.txt
+ninja
 echo "make install ...."
-make install
+ninja install
 cd ../
 
 # packager release files
 cd ../ql_tools/beken_packager
-./beken_packager
+./beken_packager.bat
 mv all_2M.1220.bin fc41d_bsp_app_uart_2M.1220.bin ../../ql_out
 cd -
 

@@ -1,6 +1,10 @@
 # 最小的cmake版本
 cmake_minimum_required(VERSION 3.18)
 
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_VERSION 1)
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/config.cmake)
 
 # 检测操作系统哦
