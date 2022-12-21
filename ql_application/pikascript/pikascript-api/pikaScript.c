@@ -17,7 +17,7 @@ volatile PikaObj *__pikaMain;
 PikaObj *pikaScriptInit(void){
     __platform_printf("======[pikascript packages installed]======\r\n");
     pks_printVersion();
-    __platform_printf("PikaStdDevice==v2.1.1\r\n");
+    __platform_printf("PikaStdDevice==latest\r\n");
     __platform_printf("PikaStdLib==v1.11.9\r\n");
     __platform_printf("base64==v1.0.0\r\n");
     __platform_printf("hashlib==v1.0.1\r\n");
@@ -32,12 +32,12 @@ PikaObj *pikaScriptInit(void){
     obj_run(pikaMain,
             "import PikaStdLib\n"
             "import PikaStdDevice as std\n"
-            "import FC41D\n"
+            "# import FC41D\n"
             "import socket\n"
             "import hashlib\n"
             "import hmac\n"
             "import base64\n"
-            "time = FC41D.Time()\n"
+            "time = std.Time()\n"
             "mem = PikaStdLib.MemChecker()\n"
             "print('hello pikascript on FC41D')\n"
             "print('mem.max :')\n"

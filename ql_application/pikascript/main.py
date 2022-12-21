@@ -1,13 +1,13 @@
 import PikaStdLib
 import PikaStdDevice as std
-import FC41D
+# import FC41D
 import socket
 import hashlib
 import hmac
 import base64
 
 
-time = FC41D.Time()
+time = std.Time()
 mem = PikaStdLib.MemChecker()
 
 print('hello pikascript on FC41D')

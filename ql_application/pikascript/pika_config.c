@@ -6,7 +6,6 @@
 
 #include "pika_config.h"
 
-
 int __platform_vsnprintf(char* buff,
                          size_t size,
                          const char* fmt,
@@ -22,8 +21,16 @@ int __platform_sprintf(char* buff, char* fmt, ...) {
     return res;
 }
 
-int64_t __platform_getTick(void) {
+int64_t __platform_get_tick_ms(void) {
     return (int64_t)ql_rtos_up_time_ms();
+}
+
+void __platform_sleep_ms(ms) {
+    ql_rtos_task_sleep_ms(ms);
+}
+
+void __platform_sleep_s(s) {
+    ql_rtos_task_sleep_s(s);
 }
 
 void* __platform_malloc(size_t size) {

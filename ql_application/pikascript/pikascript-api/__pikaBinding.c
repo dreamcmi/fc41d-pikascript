@@ -12,17 +12,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "BaseObj.h"
-#include "FC41D.h"
-#include "TinyObj.h"
-#include "FC41D_Time.h"
-#include "PikaStdDevice_Time.h"
 #include "PikaDebug.h"
 #include "TinyObj.h"
 #include "PikaDebug_Debuger.h"
 #include "TinyObj.h"
 #include "PikaMain.h"
 #include "PikaStdLib_SysObj.h"
-#include "FC41D.h"
 #include "PikaStdDevice.h"
 #include "PikaStdLib.h"
 #include "_hashlib.h"
@@ -101,75 +96,6 @@
 #include "base64.h"
 #include "TinyObj.h"
 
-#ifndef PIKA_MODULE_FC41D_DISABLE
-void FC41D_TimeMethod(PikaObj *self, Args *args){
-    Arg* res = FC41D_Time(self);
-    method_returnArg(args, res);
-}
-method_typedef(
-    FC41D_Time,
-    "Time", ""
-);
-
-class_def(FC41D){
-    __BEFORE_MOETHOD_DEF
-    constructor_def(FC41D_Time, 2089610356),
-};
-class_inhert(FC41D, TinyObj);
-
-PikaObj *New_FC41D(Args *args){
-    PikaObj *self = New_TinyObj(args);
-    obj_setClass(self, FC41D);
-    return self;
-}
-#endif
-
-#ifndef PIKA_MODULE_FC41D_DISABLE
-void FC41D_Time_platformGetTickMethod(PikaObj *self, Args *args){
-    FC41D_Time_platformGetTick(self);
-}
-method_typedef(
-    FC41D_Time_platformGetTick,
-    "platformGetTick", ""
-);
-
-void FC41D_Time_sleep_msMethod(PikaObj *self, Args *args){
-    int ms = args_getInt(args, "ms");
-    FC41D_Time_sleep_ms(self, ms);
-}
-method_typedef(
-    FC41D_Time_sleep_ms,
-    "sleep_ms", "ms"
-);
-
-void FC41D_Time_sleep_sMethod(PikaObj *self, Args *args){
-    int s = args_getInt(args, "s");
-    FC41D_Time_sleep_s(self, s);
-}
-method_typedef(
-    FC41D_Time_sleep_s,
-    "sleep_s", "s"
-);
-
-class_def(FC41D_Time){
-    __BEFORE_MOETHOD_DEF
-    method_def(FC41D_Time_sleep_ms, 164842493),
-    method_def(FC41D_Time_sleep_s, 460522064),
-    method_def(FC41D_Time_platformGetTick, 1897947957),
-};
-class_inhert(FC41D_Time, PikaStdDevice_Time);
-
-PikaObj *New_FC41D_Time(Args *args){
-    PikaObj *self = New_PikaStdDevice_Time(args);
-    obj_setClass(self, FC41D_Time);
-    return self;
-}
-
-Arg *FC41D_Time(PikaObj *self){
-    return obj_newObjInPackage(New_FC41D_Time);
-}
-#endif
-
 #ifndef PIKA_MODULE_PIKADEBUG_DISABLE
 void PikaDebug_DebugerMethod(PikaObj *self, Args *args){
     Arg* res = PikaDebug_Debuger(self);
@@ -236,7 +162,6 @@ class_inhert(PikaMain, PikaStdLib_SysObj);
 
 PikaObj *New_PikaMain(Args *args){
     PikaObj *self = New_PikaStdLib_SysObj(args);
-    obj_newObj(self, "FC41D", "FC41D", New_FC41D);
     obj_newObj(self, "PikaStdDevice", "PikaStdDevice", New_PikaStdDevice);
     obj_newObj(self, "PikaStdLib", "PikaStdLib", New_PikaStdLib);
     obj_newObj(self, "_hashlib", "_hashlib", New__hashlib);
