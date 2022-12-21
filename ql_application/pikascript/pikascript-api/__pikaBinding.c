@@ -25,6 +25,10 @@
 #include "FC41D.h"
 #include "PikaStdDevice.h"
 #include "PikaStdLib.h"
+#include "_hashlib.h"
+#include "_hmac.h"
+#include "_socket.h"
+#include "base64.h"
 #include "PikaStdData.h"
 #include "TinyObj.h"
 #include "PikaStdData_ByteArray.h"
@@ -82,6 +86,20 @@
 #include "PikaStdTask_Task.h"
 #include "PikaStdLib_SysObj.h"
 #include "PikaStdData_List.h"
+#include "_hashlib.h"
+#include "TinyObj.h"
+#include "_hashlib_Hash.h"
+#include "TinyObj.h"
+#include "_hmac.h"
+#include "TinyObj.h"
+#include "_hmac_HMAC.h"
+#include "TinyObj.h"
+#include "_socket.h"
+#include "TinyObj.h"
+#include "_socket_socket.h"
+#include "TinyObj.h"
+#include "base64.h"
+#include "TinyObj.h"
 
 #ifndef PIKA_MODULE_FC41D_DISABLE
 void FC41D_TimeMethod(PikaObj *self, Args *args){
@@ -221,6 +239,10 @@ PikaObj *New_PikaMain(Args *args){
     obj_newObj(self, "FC41D", "FC41D", New_FC41D);
     obj_newObj(self, "PikaStdDevice", "PikaStdDevice", New_PikaStdDevice);
     obj_newObj(self, "PikaStdLib", "PikaStdLib", New_PikaStdLib);
+    obj_newObj(self, "_hashlib", "_hashlib", New__hashlib);
+    obj_newObj(self, "_hmac", "_hmac", New__hmac);
+    obj_newObj(self, "_socket", "_socket", New__socket);
+    obj_newObj(self, "base64", "base64", New_base64);
     obj_setClass(self, PikaMain);
     return self;
 }
@@ -3571,6 +3593,352 @@ PikaObj *New_PikaStdTask_Task(Args *args){
 
 Arg *PikaStdTask_Task(PikaObj *self){
     return obj_newObjInPackage(New_PikaStdTask_Task);
+}
+#endif
+
+#ifndef PIKA_MODULE__HASHLIB_DISABLE
+void _hashlib_HashMethod(PikaObj *self, Args *args){
+    Arg* res = _hashlib_Hash(self);
+    method_returnArg(args, res);
+}
+method_typedef(
+    _hashlib_Hash,
+    "Hash", ""
+);
+
+class_def(_hashlib){
+    __BEFORE_MOETHOD_DEF
+    constructor_def(_hashlib_Hash, 2089170601),
+};
+class_inhert(_hashlib, TinyObj);
+
+PikaObj *New__hashlib(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, _hashlib);
+    return self;
+}
+#endif
+
+#ifndef PIKA_MODULE__HASHLIB_DISABLE
+void _hashlib_Hash_copyMethod(PikaObj *self, Args *args){
+    _hashlib_Hash_copy(self);
+}
+method_typedef(
+    _hashlib_Hash_copy,
+    "copy", ""
+);
+
+void _hashlib_Hash_digestMethod(PikaObj *self, Args *args){
+    Arg* res = _hashlib_Hash_digest(self);
+    method_returnArg(args, res);
+}
+method_typedef(
+    _hashlib_Hash_digest,
+    "digest", ""
+);
+
+void _hashlib_Hash_hexdigestMethod(PikaObj *self, Args *args){
+    char* res = _hashlib_Hash_hexdigest(self);
+    method_returnStr(args, res);
+}
+method_typedef(
+    _hashlib_Hash_hexdigest,
+    "hexdigest", ""
+);
+
+void _hashlib_Hash_newMethod(PikaObj *self, Args *args){
+    char* mode = args_getStr(args, "mode");
+    Arg* data = args_getArg(args, "data");
+    _hashlib_Hash_new(self, mode, data);
+}
+method_typedef(
+    _hashlib_Hash_new,
+    "new", "mode,data"
+);
+
+void _hashlib_Hash_updateMethod(PikaObj *self, Args *args){
+    Arg* data = args_getArg(args, "data");
+    _hashlib_Hash_update(self, data);
+}
+method_typedef(
+    _hashlib_Hash_update,
+    "update", "data"
+);
+
+class_def(_hashlib_Hash){
+    __BEFORE_MOETHOD_DEF
+    method_def(_hashlib_Hash_hexdigest, 14290442),
+    method_def(_hashlib_Hash_new, 193500239),
+    method_def(_hashlib_Hash_update, 552456360),
+    method_def(_hashlib_Hash_digest, 2026449029),
+    method_def(_hashlib_Hash_copy, 2090156064),
+};
+class_inhert(_hashlib_Hash, TinyObj);
+
+PikaObj *New__hashlib_Hash(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, _hashlib_Hash);
+    return self;
+}
+
+Arg *_hashlib_Hash(PikaObj *self){
+    return obj_newObjInPackage(New__hashlib_Hash);
+}
+#endif
+
+#ifndef PIKA_MODULE__HMAC_DISABLE
+void _hmac_HMACMethod(PikaObj *self, Args *args){
+    Arg* res = _hmac_HMAC(self);
+    method_returnArg(args, res);
+}
+method_typedef(
+    _hmac_HMAC,
+    "HMAC", ""
+);
+
+class_def(_hmac){
+    __BEFORE_MOETHOD_DEF
+    constructor_def(_hmac_HMAC, 2089147134),
+};
+class_inhert(_hmac, TinyObj);
+
+PikaObj *New__hmac(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, _hmac);
+    return self;
+}
+#endif
+
+#ifndef PIKA_MODULE__HMAC_DISABLE
+void _hmac_HMAC_copyMethod(PikaObj *self, Args *args){
+    _hmac_HMAC_copy(self);
+}
+method_typedef(
+    _hmac_HMAC_copy,
+    "copy", ""
+);
+
+void _hmac_HMAC_digestMethod(PikaObj *self, Args *args){
+    Arg* res = _hmac_HMAC_digest(self);
+    method_returnArg(args, res);
+}
+method_typedef(
+    _hmac_HMAC_digest,
+    "digest", ""
+);
+
+void _hmac_HMAC_hexdigestMethod(PikaObj *self, Args *args){
+    char* res = _hmac_HMAC_hexdigest(self);
+    method_returnStr(args, res);
+}
+method_typedef(
+    _hmac_HMAC_hexdigest,
+    "hexdigest", ""
+);
+
+void _hmac_HMAC_newMethod(PikaObj *self, Args *args){
+    Arg* key = args_getArg(args, "key");
+    Arg* msg = args_getArg(args, "msg");
+    char* digestmod = args_getStr(args, "digestmod");
+    _hmac_HMAC_new(self, key, msg, digestmod);
+}
+method_typedef(
+    _hmac_HMAC_new,
+    "new", "key,msg,digestmod"
+);
+
+void _hmac_HMAC_updateMethod(PikaObj *self, Args *args){
+    Arg* msg = args_getArg(args, "msg");
+    _hmac_HMAC_update(self, msg);
+}
+method_typedef(
+    _hmac_HMAC_update,
+    "update", "msg"
+);
+
+class_def(_hmac_HMAC){
+    __BEFORE_MOETHOD_DEF
+    method_def(_hmac_HMAC_hexdigest, 14290442),
+    method_def(_hmac_HMAC_new, 193500239),
+    method_def(_hmac_HMAC_update, 552456360),
+    method_def(_hmac_HMAC_digest, 2026449029),
+    method_def(_hmac_HMAC_copy, 2090156064),
+};
+class_inhert(_hmac_HMAC, TinyObj);
+
+PikaObj *New__hmac_HMAC(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, _hmac_HMAC);
+    return self;
+}
+
+Arg *_hmac_HMAC(PikaObj *self){
+    return obj_newObjInPackage(New__hmac_HMAC);
+}
+#endif
+
+#ifndef PIKA_MODULE__SOCKET_DISABLE
+void _socket__gethostnameMethod(PikaObj *self, Args *args){
+    char* res = _socket__gethostname(self);
+    method_returnStr(args, res);
+}
+method_typedef(
+    _socket__gethostname,
+    "_gethostname", ""
+);
+
+void _socket_socketMethod(PikaObj *self, Args *args){
+    Arg* res = _socket_socket(self);
+    method_returnArg(args, res);
+}
+method_typedef(
+    _socket_socket,
+    "socket", ""
+);
+
+class_def(_socket){
+    __BEFORE_MOETHOD_DEF
+    constructor_def(_socket_socket, 472974126),
+    method_def(_socket__gethostname, 2076113347),
+};
+class_inhert(_socket, TinyObj);
+
+PikaObj *New__socket(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, _socket);
+    return self;
+}
+#endif
+
+#ifndef PIKA_MODULE__SOCKET_DISABLE
+void _socket_socket__acceptMethod(PikaObj *self, Args *args){
+    _socket_socket__accept(self);
+}
+method_typedef(
+    _socket_socket__accept,
+    "_accept", ""
+);
+
+void _socket_socket__bindMethod(PikaObj *self, Args *args){
+    char* host = args_getStr(args, "host");
+    int port = args_getInt(args, "port");
+    _socket_socket__bind(self, host, port);
+}
+method_typedef(
+    _socket_socket__bind,
+    "_bind", "host,port"
+);
+
+void _socket_socket__closeMethod(PikaObj *self, Args *args){
+    _socket_socket__close(self);
+}
+method_typedef(
+    _socket_socket__close,
+    "_close", ""
+);
+
+void _socket_socket__connectMethod(PikaObj *self, Args *args){
+    char* host = args_getStr(args, "host");
+    int port = args_getInt(args, "port");
+    _socket_socket__connect(self, host, port);
+}
+method_typedef(
+    _socket_socket__connect,
+    "_connect", "host,port"
+);
+
+void _socket_socket__initMethod(PikaObj *self, Args *args){
+    _socket_socket__init(self);
+}
+method_typedef(
+    _socket_socket__init,
+    "_init", ""
+);
+
+void _socket_socket__listenMethod(PikaObj *self, Args *args){
+    int num = args_getInt(args, "num");
+    _socket_socket__listen(self, num);
+}
+method_typedef(
+    _socket_socket__listen,
+    "_listen", "num"
+);
+
+void _socket_socket__recvMethod(PikaObj *self, Args *args){
+    int num = args_getInt(args, "num");
+    Arg* res = _socket_socket__recv(self, num);
+    method_returnArg(args, res);
+}
+method_typedef(
+    _socket_socket__recv,
+    "_recv", "num"
+);
+
+void _socket_socket__sendMethod(PikaObj *self, Args *args){
+    Arg* data = args_getArg(args, "data");
+    _socket_socket__send(self, data);
+}
+method_typedef(
+    _socket_socket__send,
+    "_send", "data"
+);
+
+class_def(_socket_socket){
+    __BEFORE_MOETHOD_DEF
+    method_def(_socket_socket__bind, 250454625),
+    method_def(_socket_socket__init, 250711480),
+    method_def(_socket_socket__recv, 251024916),
+    method_def(_socket_socket__send, 251061198),
+    method_def(_socket_socket__listen, 406217811),
+    method_def(_socket_socket__close, 1823847098),
+    method_def(_socket_socket__connect, 2010642926),
+    method_def(_socket_socket__accept, 2115505652),
+};
+class_inhert(_socket_socket, TinyObj);
+
+PikaObj *New__socket_socket(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, _socket_socket);
+    return self;
+}
+
+Arg *_socket_socket(PikaObj *self){
+    return obj_newObjInPackage(New__socket_socket);
+}
+#endif
+
+#ifndef PIKA_MODULE_BASE64_DISABLE
+void base64_b64decodeMethod(PikaObj *self, Args *args){
+    Arg* s = args_getArg(args, "s");
+    Arg* res = base64_b64decode(self, s);
+    method_returnArg(args, res);
+}
+method_typedef(
+    base64_b64decode,
+    "b64decode", "s"
+);
+
+void base64_b64encodeMethod(PikaObj *self, Args *args){
+    Arg* s = args_getArg(args, "s");
+    Arg* res = base64_b64encode(self, s);
+    method_returnArg(args, res);
+}
+method_typedef(
+    base64_b64encode,
+    "b64encode", "s"
+);
+
+class_def(base64){
+    __BEFORE_MOETHOD_DEF
+    method_def(base64_b64decode, 1930871925),
+    method_def(base64_b64encode, 1980680607),
+};
+class_inhert(base64, TinyObj);
+
+PikaObj *New_base64(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, base64);
+    return self;
 }
 #endif
 

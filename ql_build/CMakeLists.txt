@@ -38,8 +38,8 @@ set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_LINKER> <CMAKE_C_LINK_FLAGS> -o <TARGET> <OB
 
 ## 设置编译参数和连接参数 -marm -mcpu=arm968e-s -mthumb-interwork -nostdlib
 set(ASM_OPTIONS "-g -marm -mthumb-interwork -mcpu=arm968e-s -march=armv5te -x assembler-with-cpp")
-set(CMAKE_C_FLAGS "-g -DPIKA_CONFIG_ENABLE -DCFG_OS_FREERTOS=1 -DWIFI_BLE_COEXIST -mthumb -mcpu=arm968e-s -march=armv5te -mthumb-interwork -mlittle-endian -Os -std=c99 -ffunction-sections -Wall -Wno-format -Wno-unknown-pragmas -fsigned-char -fdata-sections -nostdlib -fno-strict-aliasing -fno-common")
-set(CMAKE_CXX_FLAGS "-g -DPIKA_CONFIG_ENABLE -DCFG_OS_FREERTOS=1 -DWIFI_BLE_COEXIST -mthumb -mcpu=arm968e-s -march=armv5te -mthumb-interwork -mlittle-endian -Os -std=c99 -ffunction-sections -Wall -Wno-format -Wno-unknown-pragmas -fsigned-char -fdata-sections -nostdlib -fno-strict-aliasing -fno-common")
+set(CMAKE_C_FLAGS "-g -DPIKA_CONFIG_ENABLE -DPIKA_LWIP_ENABLE -DCFG_OS_FREERTOS=1 -DWIFI_BLE_COEXIST -mthumb -mcpu=arm968e-s -march=armv5te -mthumb-interwork -mlittle-endian -Os -std=c99 -ffunction-sections -Wall -Wno-format -Wno-unknown-pragmas -fsigned-char -fdata-sections -nostdlib -fno-strict-aliasing -fno-common")
+set(CMAKE_CXX_FLAGS "-g -DPIKA_CONFIG_ENABLE -DPIKA_LWIP_ENABLE -DCFG_OS_FREERTOS=1 -DWIFI_BLE_COEXIST -mthumb -mcpu=arm968e-s -march=armv5te -mthumb-interwork -mlittle-endian -Os -std=c99 -ffunction-sections -Wall -Wno-format -Wno-unknown-pragmas -fsigned-char -fdata-sections -nostdlib -fno-strict-aliasing -fno-common")
 ###########################################################################
 project(fc41d VERSION 1.0)
 
@@ -87,6 +87,10 @@ list(APPEND include_files
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdDevice
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdLib
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/FC41D/
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/socket/
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/hashlib/
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/hmac/
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/base64/
 
     ${CMAKE_CURRENT_LIST_DIR}/../ql_kernel/common
     ${CMAKE_CURRENT_LIST_DIR}/../ql_kernel/demo
@@ -282,6 +286,10 @@ file (GLOB pika_src
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-core/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdDevice/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdLib/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/socket/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/hashlib/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/hmac/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/base64/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/FC41D/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pika_config.c)
 

@@ -17,6 +17,7 @@
         "rtos_pub.h": "c",
         "error.h": "c",
         "ql_api_osi.h": "c",
-        "fc41d_time.h": "c"
+        "fc41d_time.h": "c",
+        "base64.h": "c"
     }
 }

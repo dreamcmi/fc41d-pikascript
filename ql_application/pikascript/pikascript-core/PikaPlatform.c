@@ -75,7 +75,6 @@ PIKA_WEAK int64_t __platform_getTick(void) {
 
 #ifndef __platform_printf
 PIKA_WEAK void __platform_printf(char* fmt, ...) {
-    #error "printf not rewrite"
     va_list args;
     va_start(args, fmt);
     vprintf(fmt, args);
