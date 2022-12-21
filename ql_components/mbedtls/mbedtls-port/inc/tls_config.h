@@ -64,7 +64,7 @@ extern void tls_mbedtls_mem_free(void *ptr);
 #define MBEDTLS_PK_C
 #define MBEDTLS_PK_PARSE_C
 #define MBEDTLS_SHA256_C
-// #define MBEDTLS_SHA512_C
+#define MBEDTLS_SHA512_C
 #define MBEDTLS_SSL_CLI_C
 // #define MBEDTLS_SSL_SRV_C
 #define MBEDTLS_SSL_TLS_C
