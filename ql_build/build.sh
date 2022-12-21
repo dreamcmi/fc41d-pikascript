@@ -79,7 +79,7 @@ cd ../
 
 # packager release files
 cd ../ql_tools/beken_packager
-./beken_packager.bat
+echo "\n" | ./beken_packager.bat
 mv all_2M.1220.bin fc41d_bsp_app_uart_2M.1220.bin ../../ql_out
 cd -
 
