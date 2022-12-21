@@ -11,7 +11,7 @@
 #include "ql_gpio.h"
 #include "ql_wlan.h"
 #include "rtos_pub.h"
-
+#include "uart_pub.h"
 #include "pikascript.h"
 
 typedef struct fc41d_port {

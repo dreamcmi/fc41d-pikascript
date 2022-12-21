@@ -83,19 +83,19 @@ G2.low()
 # ##################
 
 ##################
-print("socket test begin")
-print("当前占用内存:",mem.now())
-s = socket.socket()
-host = "112.125.89.8"
-port = 33911
-s.connect((host, port))
-print("连接成功占用内存:",mem.now())
-s.send("hello pika from fc41d")
-print("发送消息占用内存:",mem.now())
-s.close()
-print("关闭连接占用内存:",mem.now())
-del s
-print("清理现场占用内存:",mem.now())
+# print("socket test begin")
+# print("当前占用内存:",mem.now())
+# s = socket.socket()
+# host = "112.125.89.8"
+# port = 33911
+# s.connect((host, port))
+# print("连接成功占用内存:",mem.now())
+# s.send("hello pika from fc41d")
+# print("发送消息占用内存:",mem.now())
+# s.close()
+# print("关闭连接占用内存:",mem.now())
+# del s
+# print("清理现场占用内存:",mem.now())
 ##################
 
 

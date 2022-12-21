@@ -18,6 +18,12 @@
         "error.h": "c",
         "ql_api_osi.h": "c",
         "fc41d_time.h": "c",
-        "base64.h": "c"
+        "base64.h": "c",
+        "sha512.h": "c",
+        "pikaplatform_socket.h": "c",
+        "tls_config.h": "c",
+        "stddef.h": "c",
+        "pika_hal_table.h": "c",
+        "pika_hal_table_rule.h": "c"
     }
 }
