@@ -4,11 +4,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "common.h"
 #include "error.h"
 #include "include.h"
-#include "ql_gpio.h"
-#include "rtos_pub.h"
 #include "ql_api_osi.h"
+#include "ql_gpio.h"
+#include "ql_wlan.h"
+#include "rtos_pub.h"
 
 #include "pikascript.h"
 
@@ -24,22 +26,69 @@ static fc41d_port_t led[] = {
     {7, "PWM3", QL_GPIO8},   {8, "PWM4", QL_GPIO9},
 };
 
-void pika_thread() {
+static ql_sem_t wlan_ready_sem = NULL;
+static ql_task_t pika_thread_handle = NULL;
+
+static void wlan_status(ql_wlan_evt_type* ctxt) {
+    ql_LinkStatusTypeDef_s linkStatus;
+    os_memset(&linkStatus, 0x0, sizeof(LinkStatusTypeDef));
+    os_printf("[wlan-debug]status change:%d\r\n", *ctxt);
+
+    ql_wlan_get_link_status(&linkStatus);
+    ql_wlan_log("[D]sta:rssi=%d,ssid=%s,bssid=" MACSTR
+                ",channel=%d,cipher_type:",
+                linkStatus.wifi_strength, linkStatus.ssid,
+                MAC2STR(linkStatus.bssid), linkStatus.channel);
+    if (*ctxt == QL_WLAN_EVT_STA_GOT_IP) {
+        ql_rtos_semaphore_release(wlan_ready_sem);
+    }
+}
+
+static void pika_thread() {
     os_printf("pika_thread entry\r\n");
+    ql_network_InitTypeDef_s wNetConfig;
+
+    os_memset(&wNetConfig, 0x0, sizeof(network_InitTypeDef_st));
+
+    os_strcpy((char*)wNetConfig.wifi_ssid, "AR300M-NOR");
+    os_strcpy((char*)wNetConfig.wifi_key, "goodlife");
+    wNetConfig.wifi_mode = QL_STATION;
+    wNetConfig.dhcp_mode = DHCP_CLIENT;
+    wNetConfig.wifi_retry_interval = 100;
+
+    os_printf("[D]ssid:%s key:%s\r\n", wNetConfig.wifi_ssid,
+              wNetConfig.wifi_key);
+
+    ql_wlan_status_register_cb(wlan_status);
+    ql_wlan_start(&wNetConfig);
+
+    if (wlan_ready_sem) {
+        ql_rtos_semaphore_wait(wlan_ready_sem, BEKEN_WAIT_FOREVER);
+        os_printf("[wifi-debug]connect ok and got ip \r\n");
+        goto exit;
+    } else {
+        os_printf("[wifi-debug]sem error\r\n");
+    }
+
+exit:
+    os_printf("pika entry\r\n");
 
     pikaScriptInit();
 
-    os_printf("pika_thread pika run end\r\n");
+    os_printf("pika run end\r\n");
     while (1) {
         ql_rtos_task_sleep_ms(1000);
     }
 }
 
-static ql_task_t pika_thread_handle = NULL;
-
 void ql_demo_main() {
     int ret;
     os_printf("demo test start \n");
+
+    ret = ql_rtos_semaphore_create(&wlan_ready_sem, 1);
+    if (ret != kNoErr) {
+        os_printf("[D]rtos_init_semaphore err:%d\r\n", ret);
+    }
 
     ret = ql_rtos_task_create(&pika_thread_handle, 8192,
                               THD_EXTENDED_APP_PRIORITY, "pikascript",
@@ -47,13 +96,8 @@ void ql_demo_main() {
 
     if (ret != kNoErr) {
         os_printf("Error: Failed to create thread: %d\r\n", ret);
-        goto init_err;
-    }
-
-    return;
-
-init_err:
-    if (pika_thread_handle != NULL) {
-        ql_rtos_task_delete(pika_thread_handle);
+        if (pika_thread_handle != NULL) {
+            ql_rtos_task_delete(pika_thread_handle);
+        }
     }
 }
