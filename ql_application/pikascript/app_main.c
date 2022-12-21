@@ -65,17 +65,19 @@ static void pika_thread() {
     if (wlan_ready_sem) {
         ql_rtos_semaphore_wait(wlan_ready_sem, BEKEN_WAIT_FOREVER);
         os_printf("[wifi-debug]connect ok and got ip \r\n");
-        goto exit;
+        goto pika_run;
     } else {
         os_printf("[wifi-debug]sem error\r\n");
+        goto exit;
     }
 
-exit:
+pika_run:
     os_printf("pika entry\r\n");
 
     pikaScriptInit();
 
     os_printf("pika run end\r\n");
+exit:
     while (1) {
         ql_rtos_task_sleep_ms(1000);
     }
@@ -88,6 +90,9 @@ void ql_demo_main() {
     ret = ql_rtos_semaphore_create(&wlan_ready_sem, 1);
     if (ret != kNoErr) {
         os_printf("[D]rtos_init_semaphore err:%d\r\n", ret);
+        if (wlan_ready_sem != NULL) {
+            ql_rtos_semaphore_delete(wlan_ready_sem);
+        }
     }
 
     ret = ql_rtos_task_create(&pika_thread_handle, 8192,
