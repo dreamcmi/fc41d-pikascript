@@ -16,17 +16,21 @@ mem.max()
 print('mem.now :')
 mem.now()
 
-G1 = std.GPIO()
-G1.setPin('22')
-G1.setMode('out')
-G1.enable()
-G1.low()
+# G1 = std.GPIO()
+# G1.setPin('22')
+# G1.setMode('out')
+# G1.enable()
+# G1.low()
 
-G2 = std.GPIO()
-G2.setPin('23')
-G2.setMode('out')
-G2.enable()
-G2.low()
+# G2 = std.GPIO()
+# G2.setPin('23')
+# G2.setMode('out')
+# G2.enable()
+# G2.low()
+
+a1 = std.ADC()
+a1.setPin('1')
+a1.enable()
 
 # ##################
 # secret = "0123456789"
@@ -100,11 +104,12 @@ G2.low()
 
 
 while True:
-    mem.now()
-    G1.low()
-    G2.high()
-    time.sleep_ms(500)
-    G1.high()
-    G2.low()
-    time.sleep_ms(500)
+    # mem.now()
+    # G1.low()
+    # G2.high()
+    # time.sleep_ms(500)
+    # G1.high()
+    # G2.low()
+    a1.read()
+    time.sleep_ms(1000)
     

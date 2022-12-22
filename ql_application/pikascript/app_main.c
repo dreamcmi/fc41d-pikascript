@@ -9,6 +9,7 @@
 #include "include.h"
 #include "ql_api_osi.h"
 #include "ql_gpio.h"
+#include "ql_adc.h"
 #include "ql_wlan.h"
 #include "rtos_pub.h"
 #include "uart_pub.h"
@@ -46,6 +47,7 @@ static void wlan_status(ql_wlan_evt_type* ctxt) {
 
 static void pika_thread() {
     os_printf("pika_thread entry\r\n");
+    ql_adc_thread_init();
     ql_network_InitTypeDef_s wNetConfig;
 
     os_memset(&wNetConfig, 0x0, sizeof(network_InitTypeDef_st));
