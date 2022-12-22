@@ -65,6 +65,14 @@ void* __platform_memmove(void* s1, void* s2, size_t n) {
     return os_memmove(s1, s2, n);
 }
 
+void __platform_disable_irq_handle(void) {
+    ql_rtos_exit_critical();
+}
+
+void __platform_enable_irq_handle(void) {
+    ql_rtos_enter_critical();
+}
+
 char __platform_getchar(void) {
     char buff[1] = {0};
     ql_uart_read(QL_UART_PORT_2, buff, 1);
