@@ -26,6 +26,9 @@
         "pika_hal_table.h": "c",
         "pika_hal_table_rule.h": "c",
         "pika_config.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "stdarg.h": "c",
+        "ql_uart.h": "c",
+        "HELLO.C": "cpp"
     }
 }

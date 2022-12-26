@@ -9,15 +9,15 @@
  * https://pikadoc.readthedocs.io/zh/latest/PikaScript%20%E6%A8%A1%E5%9D%97%E6%A6%82%E8%BF%B0.html
  */
 
-#ifndef __base64__H
-#define __base64__H
+#ifndef ___base64__H
+#define ___base64__H
 #include <stdio.h>
 #include <stdlib.h>
 #include "PikaObj.h"
 
-PikaObj *New_base64(Args *args);
+PikaObj *New__base64(Args *args);
 
-Arg* base64_b64decode(PikaObj *self, Arg* s);
-Arg* base64_b64encode(PikaObj *self, Arg* s);
+Arg* _base64_b64decode(PikaObj *self, Arg* s);
+Arg* _base64_b64encode(PikaObj *self, Arg* s);
 
 #endif

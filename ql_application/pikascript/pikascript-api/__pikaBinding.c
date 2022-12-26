@@ -20,10 +20,10 @@
 #include "PikaStdLib_SysObj.h"
 #include "PikaStdDevice.h"
 #include "PikaStdLib.h"
+#include "_base64.h"
 #include "_hashlib.h"
 #include "_hmac.h"
 #include "_socket.h"
-#include "base64.h"
 #include "PikaStdData.h"
 #include "TinyObj.h"
 #include "PikaStdData_ByteArray.h"
@@ -65,7 +65,7 @@
 #include "PikaStdDevice_Time.h"
 #include "PikaStdDevice_BaseDev.h"
 #include "PikaStdDevice_UART.h"
-#include "PikaStdDevice_BaseDev.h"
+#include "TinyObj.h"
 #include "PikaStdLib.h"
 #include "TinyObj.h"
 #include "PikaStdLib_MemChecker.h"
@@ -81,6 +81,8 @@
 #include "PikaStdTask_Task.h"
 #include "PikaStdLib_SysObj.h"
 #include "PikaStdData_List.h"
+#include "_base64.h"
+#include "TinyObj.h"
 #include "_hashlib.h"
 #include "TinyObj.h"
 #include "_hashlib_Hash.h"
@@ -92,8 +94,6 @@
 #include "_socket.h"
 #include "TinyObj.h"
 #include "_socket_socket.h"
-#include "TinyObj.h"
-#include "base64.h"
 #include "TinyObj.h"
 
 #ifndef PIKA_MODULE_PIKADEBUG_DISABLE
@@ -164,10 +164,10 @@ PikaObj *New_PikaMain(Args *args){
     PikaObj *self = New_PikaStdLib_SysObj(args);
     obj_newObj(self, "PikaStdDevice", "PikaStdDevice", New_PikaStdDevice);
     obj_newObj(self, "PikaStdLib", "PikaStdLib", New_PikaStdLib);
+    obj_newObj(self, "_base64", "_base64", New__base64);
     obj_newObj(self, "_hashlib", "_hashlib", New__hashlib);
     obj_newObj(self, "_hmac", "_hmac", New__hmac);
     obj_newObj(self, "_socket", "_socket", New__socket);
-    obj_newObj(self, "base64", "base64", New_base64);
     obj_setClass(self, PikaMain);
     return self;
 }
@@ -1896,6 +1896,16 @@ method_typedef(
     "read", ""
 );
 
+void PikaStdDevice_GPIO_setCallBackMethod(PikaObj *self, Args *args){
+    Arg* eventCallBack = args_getArg(args, "eventCallBack");
+    int filter = args_getInt(args, "filter");
+    PikaStdDevice_GPIO_setCallBack(self, eventCallBack, filter);
+}
+method_typedef(
+    PikaStdDevice_GPIO_setCallBack,
+    "setCallBack", "eventCallBack,filter"
+);
+
 void PikaStdDevice_GPIO_setIdMethod(PikaObj *self, Args *args){
     int id = args_getInt(args, "id");
     PikaStdDevice_GPIO_setId(self, id);
@@ -1945,6 +1955,7 @@ class_def(PikaStdDevice_GPIO){
     method_def(PikaStdDevice_GPIO_setPin, 461696568),
     method_def(PikaStdDevice_GPIO_platformEnable, 835227025),
     method_def(PikaStdDevice_GPIO___init__, 904762485),
+    method_def(PikaStdDevice_GPIO_setCallBack, 945732542),
     method_def(PikaStdDevice_GPIO_platformLow, 1616275740),
     method_def(PikaStdDevice_GPIO_platformHigh, 1797341162),
     method_def(PikaStdDevice_GPIO_platformRead, 1797695974),
@@ -2795,6 +2806,25 @@ method_typedef(
     "setBaudRate", "baudRate"
 );
 
+void PikaStdDevice_UART_setCallBackMethod(PikaObj *self, Args *args){
+    Arg* eventCallBack = args_getArg(args, "eventCallBack");
+    int filter = args_getInt(args, "filter");
+    PikaStdDevice_UART_setCallBack(self, eventCallBack, filter);
+}
+method_typedef(
+    PikaStdDevice_UART_setCallBack,
+    "setCallBack", "eventCallBack,filter"
+);
+
+void PikaStdDevice_UART_setFlowControlMethod(PikaObj *self, Args *args){
+    int flowControl = args_getInt(args, "flowControl");
+    PikaStdDevice_UART_setFlowControl(self, flowControl);
+}
+method_typedef(
+    PikaStdDevice_UART_setFlowControl,
+    "setFlowControl", "flowControl"
+);
+
 void PikaStdDevice_UART_setIdMethod(PikaObj *self, Args *args){
     int id = args_getInt(args, "id");
     PikaStdDevice_UART_setId(self, id);
@@ -2835,16 +2865,18 @@ class_def(PikaStdDevice_UART){
     method_def(PikaStdDevice_UART_writeBytes, 787295575),
     method_def(PikaStdDevice_UART_platformEnable, 835227025),
     method_def(PikaStdDevice_UART___init__, 904762485),
+    method_def(PikaStdDevice_UART_setCallBack, 945732542),
     method_def(PikaStdDevice_UART_platformWrite, 1348314773),
+    method_def(PikaStdDevice_UART_setFlowControl, 1507149322),
     method_def(PikaStdDevice_UART_setBaudRate, 1620269241),
     method_def(PikaStdDevice_UART_platformRead, 1797695974),
     method_def(PikaStdDevice_UART_enable, 2071294892),
     method_def(PikaStdDevice_UART_read, 2090683713),
 };
-class_inhert(PikaStdDevice_UART, PikaStdDevice_BaseDev);
+class_inhert(PikaStdDevice_UART, TinyObj);
 
 PikaObj *New_PikaStdDevice_UART(Args *args){
-    PikaObj *self = New_PikaStdDevice_BaseDev(args);
+    PikaObj *self = New_TinyObj(args);
     obj_setClass(self, PikaStdDevice_UART);
     return self;
 }
@@ -3521,6 +3553,41 @@ Arg *PikaStdTask_Task(PikaObj *self){
 }
 #endif
 
+#ifndef PIKA_MODULE__BASE64_DISABLE
+void _base64_b64decodeMethod(PikaObj *self, Args *args){
+    Arg* s = args_getArg(args, "s");
+    Arg* res = _base64_b64decode(self, s);
+    method_returnArg(args, res);
+}
+method_typedef(
+    _base64_b64decode,
+    "b64decode", "s"
+);
+
+void _base64_b64encodeMethod(PikaObj *self, Args *args){
+    Arg* s = args_getArg(args, "s");
+    Arg* res = _base64_b64encode(self, s);
+    method_returnArg(args, res);
+}
+method_typedef(
+    _base64_b64encode,
+    "b64encode", "s"
+);
+
+class_def(_base64){
+    __BEFORE_MOETHOD_DEF
+    method_def(_base64_b64decode, 1930871925),
+    method_def(_base64_b64encode, 1980680607),
+};
+class_inhert(_base64, TinyObj);
+
+PikaObj *New__base64(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, _base64);
+    return self;
+}
+#endif
+
 #ifndef PIKA_MODULE__HASHLIB_DISABLE
 void _hashlib_HashMethod(PikaObj *self, Args *args){
     Arg* res = _hashlib_Hash(self);
@@ -3829,41 +3896,6 @@ PikaObj *New__socket_socket(Args *args){
 
 Arg *_socket_socket(PikaObj *self){
     return obj_newObjInPackage(New__socket_socket);
-}
-#endif
-
-#ifndef PIKA_MODULE_BASE64_DISABLE
-void base64_b64decodeMethod(PikaObj *self, Args *args){
-    Arg* s = args_getArg(args, "s");
-    Arg* res = base64_b64decode(self, s);
-    method_returnArg(args, res);
-}
-method_typedef(
-    base64_b64decode,
-    "b64decode", "s"
-);
-
-void base64_b64encodeMethod(PikaObj *self, Args *args){
-    Arg* s = args_getArg(args, "s");
-    Arg* res = base64_b64encode(self, s);
-    method_returnArg(args, res);
-}
-method_typedef(
-    base64_b64encode,
-    "b64encode", "s"
-);
-
-class_def(base64){
-    __BEFORE_MOETHOD_DEF
-    method_def(base64_b64decode, 1930871925),
-    method_def(base64_b64encode, 1980680607),
-};
-class_inhert(base64, TinyObj);
-
-PikaObj *New_base64(Args *args){
-    PikaObj *self = New_TinyObj(args);
-    obj_setClass(self, base64);
-    return self;
 }
 #endif
 

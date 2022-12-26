@@ -29,6 +29,8 @@ void PikaStdDevice_UART_platformWriteBytes(PikaObj *self);
 char* PikaStdDevice_UART_read(PikaObj *self, int length);
 Arg* PikaStdDevice_UART_readBytes(PikaObj *self, int length);
 void PikaStdDevice_UART_setBaudRate(PikaObj *self, int baudRate);
+void PikaStdDevice_UART_setCallBack(PikaObj *self, Arg* eventCallBack, int filter);
+void PikaStdDevice_UART_setFlowControl(PikaObj *self, int flowControl);
 void PikaStdDevice_UART_setId(PikaObj *self, int id);
 void PikaStdDevice_UART_write(PikaObj *self, char* data);
 void PikaStdDevice_UART_writeBytes(PikaObj *self, uint8_t* data, int length);

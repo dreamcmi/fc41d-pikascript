@@ -1,6 +1,5 @@
 #include "PikaStdDevice_Time.h"
-#include "BaseObj.h"
-#include "pika_hal.h"
+#include "PikaStdDevice_common.h"
 #if defined(__linux)
 #include <unistd.h>
 #endif
@@ -28,7 +27,7 @@ void PikaStdDevice_Time_sleep_s(PikaObj* self, int s) {
 }
 
 void PikaStdDevice_Time_platformGetTick(PikaObj* self) {
-    obj_setInt(self, "tick", __platform_get_tick_ms());
+    obj_setInt(self, "tick", __platform_getTick());
 }
 
 /*
