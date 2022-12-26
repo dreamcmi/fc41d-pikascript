@@ -12,6 +12,8 @@ typedef struct pika_hal_fc_gpio {
     ql_gpio_mode_e mode;
 } pika_hal_fc_gpio_t;
 
+static void _fc_gpio_irq(void* arg);
+
 int pika_hal_platform_GPIO_open(pika_dev* dev, char* name) {
     dev->platform_data = pikaMalloc(sizeof(pika_hal_fc_gpio_t));
     memset(dev->platform_data, 0, sizeof(pika_hal_fc_gpio_t));
@@ -95,5 +97,25 @@ int pika_hal_platform_GPIO_ioctl_config(pika_dev* dev,
         default:
             return -1;
     }
+    if (NULL != cfg->event_callback &&
+        PIKA_HAL_EVENT_CALLBACK_ENA_ENABLE == cfg->event_callback_ena) {
+        switch (cfg->event_callback_filter) {
+            case PIKA_HAL_GPIO_EVENT_SIGNAL_RISING:
+                ql_gpio_int_init(platform_gpio->port,
+                                 QL_IRQ_TRIGGER_RISING_EDGE, _fc_gpio_irq);
+                break;
+            case PIKA_HAL_GPIO_EVENT_SIGNAL_FALLING:
+                ql_gpio_int_init(platform_gpio->port,
+                                 QL_IRQ_TRIGGER_FALLING_EDGE, _fc_gpio_irq);
+                break;
+            default:
+                __platform_printf(
+                    "Error: not supported event callback filter %d\r\n",
+                    cfg->event_callback_filter);
+                return -1;
+        }
+    }
     return 0;
 }
+
+static void _fc_gpio_irq(void* arg) {}
