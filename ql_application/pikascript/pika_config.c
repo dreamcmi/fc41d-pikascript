@@ -21,16 +21,16 @@ int __platform_sprintf(char* buff, char* fmt, ...) {
     return res;
 }
 
-int64_t __platform_get_tick_ms(void) {
-    return (int64_t)ql_rtos_up_time_ms();
-}
-
 void __platform_sleep_ms(ms) {
     ql_rtos_task_sleep_ms(ms);
 }
 
 void __platform_sleep_s(s) {
     ql_rtos_task_sleep_s(s);
+}
+
+int64_t __platform_getTick(void) {
+    return (int64_t)ql_rtos_up_time_ms();
 }
 
 void* __platform_malloc(size_t size) {
