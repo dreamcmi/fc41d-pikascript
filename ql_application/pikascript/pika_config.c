@@ -21,12 +21,12 @@ int __platform_sprintf(char* buff, char* fmt, ...) {
     return res;
 }
 
-void __platform_sleep_ms(ms) {
-    ql_rtos_task_sleep_ms(ms);
+void __platform_sleep_ms(int ms) {
+    ql_rtos_task_sleep_ms((uint32_t)ms);
 }
 
-void __platform_sleep_s(s) {
-    ql_rtos_task_sleep_s(s);
+void __platform_sleep_s(int s) {
+    ql_rtos_task_sleep_s((uint32_t)s);
 }
 
 int64_t __platform_getTick(void) {
@@ -74,7 +74,7 @@ void __platform_enable_irq_handle(void) {
 }
 
 char __platform_getchar(void) {
-    char buff[1] = {0};
+    unsigned char buff[1] = {0};
     ql_uart_read(QL_UART_PORT_2, buff, 1);
     return *buff;
 }
