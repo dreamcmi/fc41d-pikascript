@@ -29,6 +29,7 @@
         "stdint.h": "c",
         "stdarg.h": "c",
         "ql_uart.h": "c",
-        "HELLO.C": "cpp"
+        "HELLO.C": "cpp",
+        "ql_i2c1_eeprom.h": "c"
     }
 }

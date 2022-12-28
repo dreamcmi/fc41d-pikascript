@@ -22,6 +22,7 @@ PikaObj *pikaScriptInit(void){
     __platform_printf("base64==v1.0.0\r\n");
     __platform_printf("hashlib==v1.0.1\r\n");
     __platform_printf("hmac==v1.0.1\r\n");
+    __platform_printf("pika_libc==v1.0.0\r\n");
     __platform_printf("socket==latest\r\n");
     __platform_printf("===========================================\r\n");
     PikaObj* pikaMain = newRootObj("pikaMain", New_PikaMain);
@@ -44,11 +45,14 @@ PikaObj *pikaScriptInit(void){
             "mem.max()\n"
             "print('mem.now :')\n"
             "mem.now()\n"
-            "# G1 = std.GPIO()\n"
-            "# G1.setPin('22')\n"
-            "# G1.setMode('out')\n"
-            "# G1.enable()\n"
-            "# G1.low()\n"
+            "G1 = std.GPIO()\n"
+            "G1.setPin('22')\n"
+            "G1.setMode('in')\n"
+            "G1.enable()\n"
+            "G1.low()\n"
+            "def cb1(signal):\n"
+            "    print('cb1', signal)\n"
+            "G1.setCallBack(cb1, G1.SIGNAL_RISING)\n"
             "# G2 = std.GPIO()\n"
             "# G2.setPin('23')\n"
             "# G2.setMode('out')\n"
@@ -69,13 +73,15 @@ PikaObj *pikaScriptInit(void){
             "# del s\n"
             "# print(\"清理现场占用内存:\",mem.now())\n"
             "##################\n"
-            "a1 = std.ADC()\n"
-            "a1.setPin('1')\n"
-            "a1.enable()\n"
+            "# a1 = std.ADC()\n"
+            "# a1.setPin('1')\n"
+            "# a1.enable()\n"
             "while True:\n"
+            "    print(\"test:\", 1)\n"
             "    mem.now()\n"
-            "    a1.read()\n"
-            "    mem.now()\n"
+            "    G1.read()\n"
+            "    # a1.read()\n"
+            "    # mem.now()\n"
             "    time.sleep_ms(1000)\n"
             "\n");
 #else 

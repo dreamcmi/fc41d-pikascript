@@ -76,6 +76,10 @@ static void pika_thread() {
 pika_run:
     os_printf("pika entry\r\n");
 
+    uint64_t i = 1;
+    os_printf("test uint64_t:%llu\r\n", i);
+    os_printf("test uint64_t:%d\r\n", i);
+
     pikaScriptInit();
 
     os_printf("pika run end\r\n");
