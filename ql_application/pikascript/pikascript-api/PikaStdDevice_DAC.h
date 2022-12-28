@@ -18,6 +18,7 @@
 PikaObj *New_PikaStdDevice_DAC(Args *args);
 
 void PikaStdDevice_DAC___init__(PikaObj *self);
+void PikaStdDevice_DAC_close(PikaObj *self);
 void PikaStdDevice_DAC_disable(PikaObj *self);
 void PikaStdDevice_DAC_enable(PikaObj *self);
 void PikaStdDevice_DAC_setPin(PikaObj *self, char* pin);

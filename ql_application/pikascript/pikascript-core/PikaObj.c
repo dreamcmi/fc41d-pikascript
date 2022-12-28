@@ -129,10 +129,10 @@ int32_t obj_deinit(PikaObj* self) {
     extern volatile PikaObj* __pikaMain;
     if (self == (PikaObj*)__pikaMain) {
         void _mem_cache_deinit(void);
-        void VMSignal_deinit(void);
+        void _VMEvent_deinit(void);
         _mem_cache_deinit();
 #if PIKA_EVENT_ENABLE
-        VMSignal_deinit();
+        _VMEvent_deinit();
 #endif
         if (NULL != _help_modules_cmodule) {
             arg_deinit((Arg*)_help_modules_cmodule);
@@ -472,8 +472,8 @@ PikaObj* newNormalObj(NewFun newObjFun) {
 #include <termios.h>
 #include <unistd.h>
 #define ECHOFLAGS (ECHO | ECHOE | ECHOK | ECHONL)
-//函数set_disp_mode用于控制是否开启输入回显功能
-//如果option为0，则关闭回显，为1则打开回显
+// 函数set_disp_mode用于控制是否开启输入回显功能
+// 如果option为0，则关闭回显，为1则打开回显
 static int set_disp_mode(int fd, int option) {
     int err;
     struct termios term;
@@ -1552,9 +1552,9 @@ char* obj_toStr(PikaObj* self) {
     return obj_getStr(self, "__res");
 }
 
-void pks_eventLicener_registEvent(PikaEventListener* self,
-                                  uint32_t eventId,
-                                  PikaObj* eventHandleObj) {
+void pks_eventListener_registEvent(PikaEventListener* self,
+                                   uint32_t eventId,
+                                   PikaObj* eventHandleObj) {
     Args buffs = {0};
     char* event_name =
         strsFormat(&buffs, PIKA_SPRINTF_BUFF_SIZE, "%ld", eventId);
@@ -1564,7 +1564,7 @@ void pks_eventLicener_registEvent(PikaEventListener* self,
     strsDeinit(&buffs);
 }
 
-void pks_eventLicener_removeEvent(PikaEventListener* self, uint32_t eventId) {
+void pks_eventListener_removeEvent(PikaEventListener* self, uint32_t eventId) {
     Args buffs = {0};
     char* event_name =
         strsFormat(&buffs, PIKA_SPRINTF_BUFF_SIZE, "%ld", eventId);
@@ -1572,8 +1572,8 @@ void pks_eventLicener_removeEvent(PikaEventListener* self, uint32_t eventId) {
     strsDeinit(&buffs);
 }
 
-PikaObj* pks_eventLisener_getEventHandleObj(PikaEventListener* self,
-                                            uint32_t eventId) {
+PikaObj* pks_eventListener_getEventHandleObj(PikaEventListener* self,
+                                             uint32_t eventId) {
     Args buffs = {0};
     char* event_name =
         strsFormat(&buffs, PIKA_SPRINTF_BUFF_SIZE, "%ld", eventId);
@@ -1583,40 +1583,41 @@ PikaObj* pks_eventLisener_getEventHandleObj(PikaEventListener* self,
     return eventHandleObj;
 }
 
-void pks_eventLisener_init(PikaEventListener** p_self) {
+void pks_eventListener_init(PikaEventListener** p_self) {
     *p_self = newNormalObj(New_TinyObj);
 }
 
-void pks_eventLisener_deinit(PikaEventListener** p_self) {
+void pks_eventListener_deinit(PikaEventListener** p_self) {
     if (NULL != *p_self) {
         obj_deinit(*p_self);
         *p_self = NULL;
     }
 }
 
-Arg* __eventLisener_runEvent(PikaEventListener* lisener,
-                             uint32_t eventId,
-                             int eventSignal) {
-    PikaObj* handler = pks_eventLisener_getEventHandleObj(lisener, eventId);
+Arg* __eventListener_runEvent(PikaEventListener* lisener,
+                              uint32_t eventId,
+                              Arg* eventData) {
+    PikaObj* handler = pks_eventListener_getEventHandleObj(lisener, eventId);
     if (NULL == handler) {
         __platform_printf(
             "Error: can not find event handler by id: [0x%02x]\r\n", eventId);
         return NULL;
     }
-    obj_setInt(handler, "eventSignal", eventSignal);
+    obj_setArg(handler, "eventData", eventData);
+    PikaObj* event_data_obj = NULL;
     /* clang-format off */
     PIKA_PYTHON(
-    _res = eventCallBack(eventSignal)
+    _res = eventCallBack(eventData)
     )
     /* clang-format on */
     const uint8_t bytes[] = {
         0x0c, 0x00, 0x00, 0x00, /* instruct array size */
-        0x10, 0x81, 0x01, 0x00, 0x00, 0x02, 0x0d, 0x00, 0x00, 0x04, 0x1b, 0x00,
+        0x10, 0x81, 0x01, 0x00, 0x00, 0x02, 0x0b, 0x00, 0x00, 0x04, 0x19, 0x00,
         /* instruct array */
-        0x20, 0x00, 0x00, 0x00, /* const pool size */
-        0x00, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c,
-        0x00, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x43, 0x61, 0x6c, 0x6c, 0x42, 0x61,
-        0x63, 0x6b, 0x00, 0x5f, 0x72, 0x65, 0x73, 0x00, /* const pool */
+        0x1e, 0x00, 0x00, 0x00, /* const pool size */
+        0x00, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x00, 0x65,
+        0x76, 0x65, 0x6e, 0x74, 0x43, 0x61, 0x6c, 0x6c, 0x42, 0x61, 0x63, 0x6b,
+        0x00, 0x5f, 0x72, 0x65, 0x73, 0x00, /* const pool */
     };
     pikaVM_runByteCode(handler, (uint8_t*)bytes);
     Arg* res = obj_getArg(handler, "_res");
@@ -1625,32 +1626,39 @@ Arg* __eventLisener_runEvent(PikaEventListener* lisener,
     return res;
 }
 
-void pks_eventLisener_sendSignal(PikaEventListener* self,
-                                 uint32_t eventId,
-                                 int eventSignal) {
+Arg* __eventListener_runEvent_dataInt(PikaEventListener* lisener,
+                                      uint32_t eventId,
+                                      int eventSignal) {
+    return __eventListener_runEvent(lisener, eventId, arg_newInt(eventSignal));
+}
+
+void pks_eventListener_send(PikaEventListener* self,
+                            uint32_t eventId,
+                            Arg* eventData) {
 #if !PIKA_EVENT_ENABLE
     __platform_printf("PIKA_EVENT_ENABLE is not enable");
     while (1) {
     };
 #else
     /* push event handler to vm event list */
-    if (PIKA_RES_OK != VMSignal_pushEvent(self, eventId, eventSignal)) {
-        __platform_printf(
-            "OverflowError: event list is full, please use bigger "
-            "PIKA_EVENT_LIST_SIZE\r\n");
-        while (1) {
-        }
+    if (PIKA_RES_OK != __eventListener_pushEvent(self, eventId, eventData)) {
     }
-    if (0 == VMSignal_getVMCnt()) {
+    if (0 == _VMEvent_getVMCnt()) {
         /* no vm running, pick up event imediately */
-        VMSignale_pickupEvent();
+        _VMEvent_pickupEvent();
     }
 #endif
 }
 
-Arg* pks_eventLisener_sendSignalAwaitResult(PikaEventListener* self,
-                                            uint32_t eventId,
-                                            int eventSignal) {
+void pks_eventListener_sendSignal(PikaEventListener* self,
+                                  uint32_t eventId,
+                                  int eventSignal) {
+    return pks_eventListener_send(self, eventId, arg_newInt(eventSignal));
+}
+
+Arg* pks_eventListener_sendSignalAwaitResult(PikaEventListener* self,
+                                             uint32_t eventId,
+                                             int eventSignal) {
     /*
      * Await result from event.
      * need implement `__platform_thread_delay()` to support thread switch */
@@ -1661,7 +1669,7 @@ Arg* pks_eventLisener_sendSignalAwaitResult(PikaEventListener* self,
 #else
     extern volatile VMSignal PikaVMSignal;
     int tail = PikaVMSignal.cq.tail;
-    pks_eventLisener_sendSignal(self, eventId, eventSignal);
+    pks_eventListener_sendSignal(self, eventId, eventSignal);
     while (1) {
         Arg* res = PikaVMSignal.cq.res[tail];
         __platform_thread_delay();

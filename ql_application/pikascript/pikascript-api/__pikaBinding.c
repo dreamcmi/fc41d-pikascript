@@ -1389,6 +1389,14 @@ method_typedef(
     "__init__", ""
 );
 
+void PikaStdDevice_ADC_closeMethod(PikaObj *self, Args *args){
+    PikaStdDevice_ADC_close(self);
+}
+method_typedef(
+    PikaStdDevice_ADC_close,
+    "close", ""
+);
+
 void PikaStdDevice_ADC_disableMethod(PikaObj *self, Args *args){
     PikaStdDevice_ADC_disable(self);
 }
@@ -1449,6 +1457,7 @@ method_typedef(
 
 class_def(PikaStdDevice_ADC){
     __BEFORE_MOETHOD_DEF
+    method_def(PikaStdDevice_ADC_close, 255564379),
     method_def(PikaStdDevice_ADC_disable, 314893497),
     method_def(PikaStdDevice_ADC_platformDisable, 326843198),
     method_def(PikaStdDevice_ADC_setPin, 461696568),
@@ -1716,6 +1725,14 @@ method_typedef(
     "__init__", ""
 );
 
+void PikaStdDevice_DAC_closeMethod(PikaObj *self, Args *args){
+    PikaStdDevice_DAC_close(self);
+}
+method_typedef(
+    PikaStdDevice_DAC_close,
+    "close", ""
+);
+
 void PikaStdDevice_DAC_disableMethod(PikaObj *self, Args *args){
     PikaStdDevice_DAC_disable(self);
 }
@@ -1752,6 +1769,7 @@ method_typedef(
 
 class_def(PikaStdDevice_DAC){
     __BEFORE_MOETHOD_DEF
+    method_def(PikaStdDevice_DAC_close, 255564379),
     method_def(PikaStdDevice_DAC_write, 279491920),
     method_def(PikaStdDevice_DAC_disable, 314893497),
     method_def(PikaStdDevice_DAC_setPin, 461696568),
@@ -1778,6 +1796,14 @@ void PikaStdDevice_GPIO___init__Method(PikaObj *self, Args *args){
 method_typedef(
     PikaStdDevice_GPIO___init__,
     "__init__", ""
+);
+
+void PikaStdDevice_GPIO_closeMethod(PikaObj *self, Args *args){
+    PikaStdDevice_GPIO_close(self);
+}
+method_typedef(
+    PikaStdDevice_GPIO_close,
+    "close", ""
 );
 
 void PikaStdDevice_GPIO_disableMethod(PikaObj *self, Args *args){
@@ -1948,6 +1974,7 @@ class_def(PikaStdDevice_GPIO){
     method_def(PikaStdDevice_GPIO_setMode, 203499702),
     method_def(PikaStdDevice_GPIO_setPull, 203614318),
     method_def(PikaStdDevice_GPIO_platformSetMode, 215449403),
+    method_def(PikaStdDevice_GPIO_close, 255564379),
     method_def(PikaStdDevice_GPIO_getId, 260060562),
     method_def(PikaStdDevice_GPIO_setId, 274291614),
     method_def(PikaStdDevice_GPIO_disable, 314893497),
@@ -2162,6 +2189,14 @@ method_typedef(
     "__init__", ""
 );
 
+void PikaStdDevice_PWM_closeMethod(PikaObj *self, Args *args){
+    PikaStdDevice_PWM_close(self);
+}
+method_typedef(
+    PikaStdDevice_PWM_close,
+    "close", ""
+);
+
 void PikaStdDevice_PWM_disableMethod(PikaObj *self, Args *args){
     PikaStdDevice_PWM_disable(self);
 }
@@ -2306,6 +2341,7 @@ class_def(PikaStdDevice_PWM){
     method_def(PikaStdDevice_PWM_setFreq, 203251455),
     method_def(PikaStdDevice_PWM_setName, 203520690),
     method_def(PikaStdDevice_PWM_platformSetDuty, 215133052),
+    method_def(PikaStdDevice_PWM_close, 255564379),
     method_def(PikaStdDevice_PWM_disable, 314893497),
     method_def(PikaStdDevice_PWM_platformDisable, 326843198),
     method_def(PikaStdDevice_PWM_setPin, 461696568),
@@ -2713,6 +2749,14 @@ method_typedef(
     "__init__", ""
 );
 
+void PikaStdDevice_UART_closeMethod(PikaObj *self, Args *args){
+    PikaStdDevice_UART_close(self);
+}
+method_typedef(
+    PikaStdDevice_UART_close,
+    "close", ""
+);
+
 void PikaStdDevice_UART_disableMethod(PikaObj *self, Args *args){
     PikaStdDevice_UART_disable(self);
 }
@@ -2855,6 +2899,7 @@ method_typedef(
 
 class_def(PikaStdDevice_UART){
     __BEFORE_MOETHOD_DEF
+    method_def(PikaStdDevice_UART_close, 255564379),
     method_def(PikaStdDevice_UART_setId, 274291614),
     method_def(PikaStdDevice_UART_write, 279491920),
     method_def(PikaStdDevice_UART_disable, 314893497),

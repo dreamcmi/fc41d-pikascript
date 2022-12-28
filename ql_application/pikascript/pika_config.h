@@ -10,6 +10,6 @@
 #include "ql_api_osi.h"
 #include "os.h"
 
-#define __platform_printf(...) os_printf(__VA_ARGS__)
+// #define __platform_printf(...) os_printf(__VA_ARGS__)
 
 #endif

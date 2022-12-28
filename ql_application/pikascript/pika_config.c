@@ -24,7 +24,7 @@
 int __platform_putchar(char ch) {
     unsigned char str[1] = {0};
     str[0] = ch;
-    ql_uart_write(QL_UART_PORT_1, str, 1);
+    ql_uart_write(QL_UART_PORT_2, str, 1);
 }
 
 

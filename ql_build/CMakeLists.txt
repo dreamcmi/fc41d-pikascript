@@ -457,6 +457,7 @@ add_custom_command(
     TARGET ${target}
     POST_BUILD
     COMMAND ${arm_gcc_objcopy} -O binary ${CMAKE_CURRENT_BINARY_DIR}/${target}.elf ${CMAKE_CURRENT_BINARY_DIR}/${target}.bin
+    COMMAND ${arm_gcc_objdump} --all-headers --demangle --disassemble ${CMAKE_CURRENT_BINARY_DIR}/${target}.elf > ${CMAKE_CURRENT_BINARY_DIR}/${target}.lst
 )
 elseif(${target} STREQUAL "fc41d_app")
 add_custom_command(

@@ -18,6 +18,7 @@
 PikaObj *New_PikaStdDevice_GPIO(Args *args);
 
 void PikaStdDevice_GPIO___init__(PikaObj *self);
+void PikaStdDevice_GPIO_close(PikaObj *self);
 void PikaStdDevice_GPIO_disable(PikaObj *self);
 void PikaStdDevice_GPIO_enable(PikaObj *self);
 int PikaStdDevice_GPIO_getId(PikaObj *self);

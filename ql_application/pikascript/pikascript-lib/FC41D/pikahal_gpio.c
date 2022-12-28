@@ -36,6 +36,7 @@ int pika_hal_platform_GPIO_read(pika_dev* dev, void* buf, size_t count) {
     UINT32 value = 0;
     pika_hal_fc_gpio_t* platform_gpio = (pika_hal_fc_gpio_t*)dev->platform_data;
     ql_gpio_get_level(platform_gpio->port, &value);
+    // int64_t value64 = value;
     // __platform_printf("read value:%d\r\n", value);
     __platform_memcpy(buf, &value, sizeof(value));
     return 0;

@@ -11,6 +11,7 @@
 #include "ql_gpio.h"
 #include "ql_adc.h"
 #include "ql_wlan.h"
+#include "ql_uart.h"
 #include "rtos_pub.h"
 #include "uart_pub.h"
 #include "pikascript.h"
@@ -75,10 +76,6 @@ static void pika_thread() {
 
 pika_run:
     os_printf("pika entry\r\n");
-
-    uint64_t i = 1;
-    os_printf("test uint64_t:%llu\r\n", i);
-    os_printf("test uint64_t:%d\r\n", i);
 
     pikaScriptInit();
 

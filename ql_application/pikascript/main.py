@@ -56,9 +56,12 @@ G1.setCallBack(cb1, G1.SIGNAL_RISING)
 # a1.enable()
 
 while True:
-    print("test:", 1)
     mem.now()
     G1.read()
+    # if i :
+    #     print("G1 high")
+    # else:
+    #     print("G1 low")
     # a1.read()
     # mem.now()
     time.sleep_ms(1000)
