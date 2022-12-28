@@ -6,26 +6,33 @@
 
 #include "pika_config.h"
 
-int __platform_vsnprintf(char* buff,
-                         size_t size,
-                         const char* fmt,
-                         va_list args) {
-    return vsnprintf(buff, size, fmt, args);
+// int __platform_vsnprintf(char* buff,
+//                          size_t size,
+//                          const char* fmt,
+//                          va_list args) {
+//     return vsnprintf(buff, size, fmt, args);
+// }
+
+// int __platform_sprintf(char* buff, char* fmt, ...) {
+//     va_list args;
+//     va_start(args, fmt);
+//     int res = vsnprintf(buff, PIKA_SPRINTF_BUFF_SIZE, fmt, args);
+//     va_end(args);
+//     return res;
+// }
+
+int __platform_putchar(char ch) {
+    unsigned char str[1] = {0};
+    str[0] = ch;
+    ql_uart_write(QL_UART_PORT_1, str, 1);
 }
 
-int __platform_sprintf(char* buff, char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    int res = vsnprintf(buff, PIKA_SPRINTF_BUFF_SIZE, fmt, args);
-    va_end(args);
-    return res;
-}
 
-void __platform_sleep_ms(int ms) {
+void __platform_sleep_ms(uint32_t ms) {
     ql_rtos_task_sleep_ms((uint32_t)ms);
 }
 
-void __platform_sleep_s(int s) {
+void __platform_sleep_s(uint32_t s) {
     ql_rtos_task_sleep_s((uint32_t)s);
 }
 
