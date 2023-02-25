@@ -31,10 +31,13 @@
 #include "dataQueue.h"
 #include "dataQueueObj.h"
 #include "dataStack.h"
+#if PIKA_SETJMP_ENABLE
+#include <setjmp.h>
+#endif
 
 enum Instruct {
 #define __INS_ENUM
-#include "__instruction_table.cfg"
+#include "__instruction_table.h"
     __INSTRCUTION_CNT,
 };
 
@@ -45,7 +48,7 @@ typedef enum {
     VM_JMP_RAISE = -996,
 } VM_JMP;
 
-typedef enum { VM_PC_EXIT = -99999 } VM_PC;
+#define VM_PC_EXIT (-99999)
 
 typedef enum {
     TRY_STATE_NONE = 0,
@@ -72,7 +75,7 @@ struct VMState {
     int32_t pc;
     ByteCodeFrame* bytecode_frame;
     uint8_t loop_deepth;
-    uint8_t error_code;
+    int8_t error_code;
     uint8_t line_error_code;
     uint8_t try_error_code;
     uint32_t ins_cnt;
@@ -132,12 +135,21 @@ typedef struct EventCQ {
     int tail;
 } EventCQ;
 
+#if PIKA_SETJMP_ENABLE
+typedef struct JmpBufCQ {
+    jmp_buf* buf[PIKA_JMP_BUF_LIST_SIZE];
+    int head;
+    int tail;
+} JmpBufCQ;
+#endif
+
 typedef struct VMSignal VMSignal;
 struct VMSignal {
     VM_SIGNAL_CTRL signal_ctrl;
     int vm_cnt;
 #if PIKA_EVENT_ENABLE
     EventCQ cq;
+    int event_pickup_cnt;
 #endif
 };
 
@@ -313,4 +325,7 @@ PIKA_RES __eventListener_pushEvent(PikaEventListener* lisener,
                                    Arg* eventData);
 int _VMEvent_getVMCnt(void);
 void _VMEvent_pickupEvent(void);
+void _pikaVM_yield(void);
+int _VM_lock_init(void);
+int _VM_is_first_lock(void);
 #endif

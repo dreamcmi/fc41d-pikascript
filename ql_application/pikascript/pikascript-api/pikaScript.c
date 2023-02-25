@@ -22,8 +22,9 @@ PikaObj *pikaScriptInit(void){
     __platform_printf("base64==v1.0.0\r\n");
     __platform_printf("hashlib==v1.0.1\r\n");
     __platform_printf("hmac==v1.0.1\r\n");
-    __platform_printf("pika_libc==v1.0.0\r\n");
+    __platform_printf("pika_libc==v1.0.1\r\n");
     __platform_printf("socket==latest\r\n");
+    __platform_printf("time==latest\r\n");
     __platform_printf("===========================================\r\n");
     PikaObj* pikaMain = newRootObj("pikaMain", New_PikaMain);
     __pikaMain = pikaMain;
@@ -38,7 +39,7 @@ PikaObj *pikaScriptInit(void){
             "import hashlib\n"
             "import hmac\n"
             "import base64\n"
-            "time = std.Time()\n"
+            "import time\n"
             "mem = PikaStdLib.MemChecker()\n"
             "print('hello pikascript on FC41D')\n"
             "print('mem.max :')\n"
@@ -58,21 +59,25 @@ PikaObj *pikaScriptInit(void){
             "# G2.setMode('out')\n"
             "# G2.enable()\n"
             "# G2.low()\n"
-            "##################\n"
-            "# print(\"socket test begin\")\n"
-            "# print(\"当前占用内存:\",mem.now())\n"
-            "# s = socket.socket()\n"
-            "# host = \"112.125.89.8\"\n"
-            "# port = 33911\n"
-            "# s.connect((host, port))\n"
-            "# print(\"连接成功占用内存:\",mem.now())\n"
-            "# s.send(\"hello pika from fc41d\")\n"
-            "# print(\"发送消息占用内存:\",mem.now())\n"
-            "# s.close()\n"
-            "# print(\"关闭连接占用内存:\",mem.now())\n"
-            "# del s\n"
-            "# print(\"清理现场占用内存:\",mem.now())\n"
-            "##################\n"
+            "#################\n"
+            "print(\"socket test begin\")\n"
+            "print(\"当前占用内存:\",mem.now())\n"
+            "s = socket.socket()\n"
+            "s.setblocking(False) \n"
+            "host = \"112.125.89.8\"\n"
+            "port = 36582\n"
+            "s.connect((host, port))\n"
+            "print(\"连接成功占用内存:\",mem.now())\n"
+            "s.send(\"hello pika from fc41d\")\n"
+            "print(\"发送消息占用内存:\",mem.now())\n"
+            "m = s.recv(10)\n"
+            "print(m)\n"
+            "print(\"接收消息占用内存:\",mem.now())\n"
+            "s.close()\n"
+            "print(\"关闭连接占用内存:\",mem.now())\n"
+            "del s\n"
+            "print(\"清理现场占用内存:\",mem.now())\n"
+            "#################\n"
             "# a1 = std.ADC()\n"
             "# a1.setPin('1')\n"
             "# a1.enable()\n"

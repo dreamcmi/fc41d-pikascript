@@ -24,6 +24,7 @@
 #include "_hashlib.h"
 #include "_hmac.h"
 #include "_socket.h"
+#include "_time.h"
 #include "PikaStdData.h"
 #include "TinyObj.h"
 #include "PikaStdData_ByteArray.h"
@@ -62,8 +63,6 @@
 #include "PikaStdDevice_BaseDev.h"
 #include "PikaStdDevice_SPI.h"
 #include "PikaStdDevice_BaseDev.h"
-#include "PikaStdDevice_Time.h"
-#include "PikaStdDevice_BaseDev.h"
 #include "PikaStdDevice_UART.h"
 #include "TinyObj.h"
 #include "PikaStdLib.h"
@@ -94,6 +93,10 @@
 #include "_socket.h"
 #include "TinyObj.h"
 #include "_socket_socket.h"
+#include "TinyObj.h"
+#include "_time.h"
+#include "TinyObj.h"
+#include "pika_libc.h"
 #include "TinyObj.h"
 
 #ifndef PIKA_MODULE_PIKADEBUG_DISABLE
@@ -168,6 +171,7 @@ PikaObj *New_PikaMain(Args *args){
     obj_newObj(self, "_hashlib", "_hashlib", New__hashlib);
     obj_newObj(self, "_hmac", "_hmac", New__hmac);
     obj_newObj(self, "_socket", "_socket", New__socket);
+    obj_newObj(self, "_time", "_time", New__time);
     obj_setClass(self, PikaMain);
     return self;
 }
@@ -1341,8 +1345,8 @@ method_typedef(
 );
 
 void PikaStdDevice_TimeMethod(PikaObj *self, Args *args){
-    Arg* res = PikaStdDevice_Time(self);
-    method_returnArg(args, res);
+    PikaObj* res = PikaStdDevice_Time(self);
+    method_returnObj(args, res);
 }
 method_typedef(
     PikaStdDevice_Time,
@@ -1369,7 +1373,7 @@ class_def(PikaStdDevice){
     constructor_def(PikaStdDevice_BaseDev, 1189166879),
     constructor_def(PikaStdDevice_GPIO, 2089114740),
     constructor_def(PikaStdDevice_UART, 2089601825),
-    constructor_def(PikaStdDevice_Time, 2089610356),
+    method_def(PikaStdDevice_Time, 2089610356),
 };
 class_inhert(PikaStdDevice, TinyObj);
 
@@ -2591,156 +2595,6 @@ Arg *PikaStdDevice_SPI(PikaObj *self){
 #endif
 
 #ifndef PIKA_MODULE_PIKASTDDEVICE_DISABLE
-void PikaStdDevice_Time___init__Method(PikaObj *self, Args *args){
-    PikaStdDevice_Time___init__(self);
-}
-method_typedef(
-    PikaStdDevice_Time___init__,
-    "__init__", ""
-);
-
-void PikaStdDevice_Time_asctimeMethod(PikaObj *self, Args *args){
-    PikaStdDevice_Time_asctime(self);
-}
-method_typedef(
-    PikaStdDevice_Time_asctime,
-    "asctime", ""
-);
-
-void PikaStdDevice_Time_ctimeMethod(PikaObj *self, Args *args){
-    pika_float unix_time = args_getFloat(args, "unix_time");
-    PikaStdDevice_Time_ctime(self, unix_time);
-}
-method_typedef(
-    PikaStdDevice_Time_ctime,
-    "ctime", "unix_time"
-);
-
-void PikaStdDevice_Time_gmtimeMethod(PikaObj *self, Args *args){
-    pika_float unix_time = args_getFloat(args, "unix_time");
-    PikaStdDevice_Time_gmtime(self, unix_time);
-}
-method_typedef(
-    PikaStdDevice_Time_gmtime,
-    "gmtime", "unix_time"
-);
-
-void PikaStdDevice_Time_localtimeMethod(PikaObj *self, Args *args){
-    pika_float unix_time = args_getFloat(args, "unix_time");
-    PikaStdDevice_Time_localtime(self, unix_time);
-}
-method_typedef(
-    PikaStdDevice_Time_localtime,
-    "localtime", "unix_time"
-);
-
-void PikaStdDevice_Time_mktimeMethod(PikaObj *self, Args *args){
-    int res = PikaStdDevice_Time_mktime(self);
-    method_returnInt(args, res);
-}
-method_typedef(
-    PikaStdDevice_Time_mktime,
-    "mktime", ""
-);
-
-void PikaStdDevice_Time_platformGetTickMethod(PikaObj *self, Args *args){
-    PikaStdDevice_Time_platformGetTick(self);
-}
-method_typedef(
-    PikaStdDevice_Time_platformGetTick,
-    "platformGetTick", ""
-);
-
-void PikaStdDevice_Time_sleepMethod(PikaObj *self, Args *args){
-    pika_float s = args_getFloat(args, "s");
-    PikaStdDevice_Time_sleep(self, s);
-}
-method_typedef(
-    PikaStdDevice_Time_sleep,
-    "sleep", "s"
-);
-
-void PikaStdDevice_Time_sleep_msMethod(PikaObj *self, Args *args){
-    int ms = args_getInt(args, "ms");
-    PikaStdDevice_Time_sleep_ms(self, ms);
-}
-method_typedef(
-    PikaStdDevice_Time_sleep_ms,
-    "sleep_ms", "ms"
-);
-
-void PikaStdDevice_Time_sleep_sMethod(PikaObj *self, Args *args){
-    int s = args_getInt(args, "s");
-    PikaStdDevice_Time_sleep_s(self, s);
-}
-method_typedef(
-    PikaStdDevice_Time_sleep_s,
-    "sleep_s", "s"
-);
-
-void PikaStdDevice_Time_timeMethod(PikaObj *self, Args *args){
-    pika_float res = PikaStdDevice_Time_time(self);
-    method_returnFloat(args, res);
-}
-method_typedef(
-    PikaStdDevice_Time_time,
-    "time", ""
-);
-
-void PikaStdDevice_Time_time_nsMethod(PikaObj *self, Args *args){
-    int res = PikaStdDevice_Time_time_ns(self);
-    method_returnInt(args, res);
-}
-method_typedef(
-    PikaStdDevice_Time_time_ns,
-    "time_ns", ""
-);
-
-class_def(PikaStdDevice_Time){
-    __BEFORE_MOETHOD_DEF
-#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
-    method_def(PikaStdDevice_Time_gmtime, 1586568),
-#endif
-    method_def(PikaStdDevice_Time_sleep_ms, 164842493),
-#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
-    method_def(PikaStdDevice_Time_mktime, 234027084),
-#endif
-#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
-    method_def(PikaStdDevice_Time_ctime, 255845143),
-#endif
-    method_def(PikaStdDevice_Time_sleep, 274527774),
-    method_def(PikaStdDevice_Time_sleep_s, 460522064),
-    method_def(PikaStdDevice_Time___init__, 904762485),
-#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
-    method_def(PikaStdDevice_Time_localtime, 907356095),
-#endif
-#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
-    method_def(PikaStdDevice_Time_asctime, 1108526539),
-#endif
-#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
-    method_def(PikaStdDevice_Time_time_ns, 1644053204),
-#endif
-#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
-    method_def(PikaStdDevice_Time_platformGetTick, 1897947957),
-#endif
-#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
-    method_def(PikaStdDevice_Time_time, 2090760340),
-#endif
-};
-class_inhert(PikaStdDevice_Time, PikaStdDevice_BaseDev);
-
-PikaObj *New_PikaStdDevice_Time(Args *args){
-    PikaObj *self = New_PikaStdDevice_BaseDev(args);
-    obj_setClass(self, PikaStdDevice_Time);
-    return self;
-}
-
-Arg *PikaStdDevice_Time(PikaObj *self){
-    return obj_newObjInPackage(New_PikaStdDevice_Time);
-}
-#endif
-
-#ifndef PIKA_MODULE_PIKASTDDEVICE_DISABLE
 void PikaStdDevice_UART___init__Method(PikaObj *self, Args *args){
     PikaStdDevice_UART___init__(self);
 }
@@ -2878,6 +2732,42 @@ method_typedef(
     "setId", "id"
 );
 
+void PikaStdDevice_UART_setPinCTSMethod(PikaObj *self, Args *args){
+    char* pin = args_getStr(args, "pin");
+    PikaStdDevice_UART_setPinCTS(self, pin);
+}
+method_typedef(
+    PikaStdDevice_UART_setPinCTS,
+    "setPinCTS", "pin"
+);
+
+void PikaStdDevice_UART_setPinRTSMethod(PikaObj *self, Args *args){
+    char* pin = args_getStr(args, "pin");
+    PikaStdDevice_UART_setPinRTS(self, pin);
+}
+method_typedef(
+    PikaStdDevice_UART_setPinRTS,
+    "setPinRTS", "pin"
+);
+
+void PikaStdDevice_UART_setPinRXMethod(PikaObj *self, Args *args){
+    char* pin = args_getStr(args, "pin");
+    PikaStdDevice_UART_setPinRX(self, pin);
+}
+method_typedef(
+    PikaStdDevice_UART_setPinRX,
+    "setPinRX", "pin"
+);
+
+void PikaStdDevice_UART_setPinTXMethod(PikaObj *self, Args *args){
+    char* pin = args_getStr(args, "pin");
+    PikaStdDevice_UART_setPinTX(self, pin);
+}
+method_typedef(
+    PikaStdDevice_UART_setPinTX,
+    "setPinTX", "pin"
+);
+
 void PikaStdDevice_UART_writeMethod(PikaObj *self, Args *args){
     char* data = args_getStr(args, "data");
     PikaStdDevice_UART_write(self, data);
@@ -2901,9 +2791,13 @@ class_def(PikaStdDevice_UART){
     __BEFORE_MOETHOD_DEF
     method_def(PikaStdDevice_UART_close, 255564379),
     method_def(PikaStdDevice_UART_setId, 274291614),
+    method_def(PikaStdDevice_UART_setPinRX, 276391714),
+    method_def(PikaStdDevice_UART_setPinTX, 276391780),
     method_def(PikaStdDevice_UART_write, 279491920),
     method_def(PikaStdDevice_UART_disable, 314893497),
     method_def(PikaStdDevice_UART_platformDisable, 326843198),
+    method_def(PikaStdDevice_UART_setPinCTS, 530975586),
+    method_def(PikaStdDevice_UART_setPinRTS, 530991921),
     method_def(PikaStdDevice_UART_readBytes, 545481704),
     method_def(PikaStdDevice_UART_platformReadBytes, 673804205),
     method_def(PikaStdDevice_UART_platformWriteBytes, 726970812),
@@ -3136,6 +3030,16 @@ method_typedef(
     "__setitem__", "obj,key,val"
 );
 
+void PikaStdLib_SysObj_boolMethod(PikaObj *self, Args *args){
+    Arg* arg = args_getArg(args, "arg");
+    PIKA_BOOL res = PikaStdLib_SysObj_bool(self, arg);
+    method_returnBool(args, res);
+}
+method_typedef(
+    PikaStdLib_SysObj_bool,
+    "bool", "arg"
+);
+
 void PikaStdLib_SysObj_bytesMethod(PikaObj *self, Args *args){
     Arg* val = args_getArg(args, "val");
     Arg* res = PikaStdLib_SysObj_bytes(self, val);
@@ -3178,7 +3082,7 @@ method_typedef(
 );
 
 void PikaStdLib_SysObj_dirMethod(PikaObj *self, Args *args){
-    PikaObj* obj = args_getPtr(args, "obj");
+    Arg* obj = args_getArg(args, "obj");
     PikaObj* res = PikaStdLib_SysObj_dir(self, obj);
     method_returnObj(args, res);
 }
@@ -3366,6 +3270,14 @@ method_typedef(
     "range", "*ax"
 );
 
+void PikaStdLib_SysObj_rebootMethod(PikaObj *self, Args *args){
+    PikaStdLib_SysObj_reboot(self);
+}
+method_typedef(
+    PikaStdLib_SysObj_reboot,
+    "reboot", ""
+);
+
 void PikaStdLib_SysObj_setattrMethod(PikaObj *self, Args *args){
     PikaObj* obj = args_getPtr(args, "obj");
     char* name = args_getStr(args, "name");
@@ -3385,6 +3297,16 @@ void PikaStdLib_SysObj_strMethod(PikaObj *self, Args *args){
 method_typedef(
     PikaStdLib_SysObj_str,
     "str", "arg"
+);
+
+void PikaStdLib_SysObj_tupleMethod(PikaObj *self, Args *args){
+    Arg* arg = args_getArg(args, "arg");
+    Arg* res = PikaStdLib_SysObj_tuple(self, arg);
+    method_returnArg(args, res);
+}
+method_typedef(
+    PikaStdLib_SysObj_tuple,
+    "tuple", "arg"
 );
 
 void PikaStdLib_SysObj_typeMethod(PikaObj *self, Args *args){
@@ -3429,6 +3351,12 @@ class_def(PikaStdLib_SysObj){
 #endif
     method_def(PikaStdLib_SysObj_print, 271190290),
     method_def(PikaStdLib_SysObj_range, 272956402),
+#if PIKA_BUILTIN_STRUCT_ENABLE
+    method_def(PikaStdLib_SysObj_tuple, 276049327),
+#endif
+#if !PIKA_NANO_ENABLE
+    method_def(PikaStdLib_SysObj_reboot, 421948272),
+#endif
 #if !PIKA_NANO_ENABLE
     method_def(PikaStdLib_SysObj_hasattr, 872734812),
 #endif
@@ -3440,6 +3368,7 @@ class_def(PikaStdLib_SysObj){
 #if !PIKA_NANO_ENABLE
     method_def(PikaStdLib_SysObj_getattr, 1886477984),
 #endif
+    method_def(PikaStdLib_SysObj_bool, 2090120081),
 #if PIKA_BUILTIN_STRUCT_ENABLE
     method_def(PikaStdLib_SysObj_dict, 2090185033),
 #endif
@@ -3920,6 +3849,15 @@ method_typedef(
     "_send", "data"
 );
 
+void _socket_socket__setblockingMethod(PikaObj *self, Args *args){
+    int sta = args_getInt(args, "sta");
+    _socket_socket__setblocking(self, sta);
+}
+method_typedef(
+    _socket_socket__setblocking,
+    "_setblocking", "sta"
+);
+
 class_def(_socket_socket){
     __BEFORE_MOETHOD_DEF
     method_def(_socket_socket__bind, 250454625),
@@ -3927,6 +3865,7 @@ class_def(_socket_socket){
     method_def(_socket_socket__recv, 251024916),
     method_def(_socket_socket__send, 251061198),
     method_def(_socket_socket__listen, 406217811),
+    method_def(_socket_socket__setblocking, 1091829561),
     method_def(_socket_socket__close, 1823847098),
     method_def(_socket_socket__connect, 2010642926),
     method_def(_socket_socket__accept, 2115505652),
@@ -3941,6 +3880,155 @@ PikaObj *New__socket_socket(Args *args){
 
 Arg *_socket_socket(PikaObj *self){
     return obj_newObjInPackage(New__socket_socket);
+}
+#endif
+
+#ifndef PIKA_MODULE__TIME_DISABLE
+void _time___init__Method(PikaObj *self, Args *args){
+    _time___init__(self);
+}
+method_typedef(
+    _time___init__,
+    "__init__", ""
+);
+
+void _time_asctimeMethod(PikaObj *self, Args *args){
+    _time_asctime(self);
+}
+method_typedef(
+    _time_asctime,
+    "asctime", ""
+);
+
+void _time_ctimeMethod(PikaObj *self, Args *args){
+    pika_float unix_time = args_getFloat(args, "unix_time");
+    _time_ctime(self, unix_time);
+}
+method_typedef(
+    _time_ctime,
+    "ctime", "unix_time"
+);
+
+void _time_gmtimeMethod(PikaObj *self, Args *args){
+    pika_float unix_time = args_getFloat(args, "unix_time");
+    _time_gmtime(self, unix_time);
+}
+method_typedef(
+    _time_gmtime,
+    "gmtime", "unix_time"
+);
+
+void _time_localtimeMethod(PikaObj *self, Args *args){
+    pika_float unix_time = args_getFloat(args, "unix_time");
+    _time_localtime(self, unix_time);
+}
+method_typedef(
+    _time_localtime,
+    "localtime", "unix_time"
+);
+
+void _time_mktimeMethod(PikaObj *self, Args *args){
+    int res = _time_mktime(self);
+    method_returnInt(args, res);
+}
+method_typedef(
+    _time_mktime,
+    "mktime", ""
+);
+
+void _time_platformGetTickMethod(PikaObj *self, Args *args){
+    _time_platformGetTick(self);
+}
+method_typedef(
+    _time_platformGetTick,
+    "platformGetTick", ""
+);
+
+void _time_sleep_msMethod(PikaObj *self, Args *args){
+    int ms = args_getInt(args, "ms");
+    _time_sleep_ms(self, ms);
+}
+method_typedef(
+    _time_sleep_ms,
+    "sleep_ms", "ms"
+);
+
+void _time_sleep_sMethod(PikaObj *self, Args *args){
+    int s = args_getInt(args, "s");
+    _time_sleep_s(self, s);
+}
+method_typedef(
+    _time_sleep_s,
+    "sleep_s", "s"
+);
+
+void _time_timeMethod(PikaObj *self, Args *args){
+    pika_float res = _time_time(self);
+    method_returnFloat(args, res);
+}
+method_typedef(
+    _time_time,
+    "time", ""
+);
+
+void _time_time_nsMethod(PikaObj *self, Args *args){
+    int res = _time_time_ns(self);
+    method_returnInt(args, res);
+}
+method_typedef(
+    _time_time_ns,
+    "time_ns", ""
+);
+
+class_def(_time){
+    __BEFORE_MOETHOD_DEF
+#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
+    method_def(_time_gmtime, 1586568),
+#endif
+    method_def(_time_sleep_ms, 164842493),
+#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
+    method_def(_time_mktime, 234027084),
+#endif
+#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
+    method_def(_time_ctime, 255845143),
+#endif
+    method_def(_time_sleep_s, 460522064),
+    method_def(_time___init__, 904762485),
+#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
+    method_def(_time_localtime, 907356095),
+#endif
+#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
+    method_def(_time_asctime, 1108526539),
+#endif
+#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
+    method_def(_time_time_ns, 1644053204),
+#endif
+#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
+    method_def(_time_platformGetTick, 1897947957),
+#endif
+#if PIKA_STD_DEVICE_UNIX_TIME_ENABLE
+    method_def(_time_time, 2090760340),
+#endif
+};
+class_inhert(_time, TinyObj);
+
+PikaObj *New__time(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, _time);
+    return self;
+}
+#endif
+
+#ifndef PIKA_MODULE_PIKA_LIBC_DISABLE
+class_def(pika_libc){
+    __BEFORE_MOETHOD_DEF
+};
+class_inhert(pika_libc, TinyObj);
+
+PikaObj *New_pika_libc(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, pika_libc);
+    return self;
 }
 #endif
 

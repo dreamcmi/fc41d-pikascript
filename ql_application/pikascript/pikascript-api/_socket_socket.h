@@ -25,5 +25,6 @@ void _socket_socket__init(PikaObj *self);
 void _socket_socket__listen(PikaObj *self, int num);
 Arg* _socket_socket__recv(PikaObj *self, int num);
 void _socket_socket__send(PikaObj *self, Arg* data);
+void _socket_socket__setblocking(PikaObj *self, int sta);
 
 #endif

@@ -1,10 +1,11 @@
 #include "PikaStdData_String.h"
 #include "PikaStdData_List.h"
 #include "PikaStdData_String_Util.h"
+#include "PikaVM.h"
 #include "dataStrs.h"
 
 char* _strlwr(char* str);
-static int string_len(char* str);
+int strGetSizeUtf8(char* str);
 
 Arg* PikaStdData_String___iter__(PikaObj* self) {
     obj_setInt(self, "__iter_i", 0);
@@ -68,7 +69,7 @@ Arg* PikaStdData_String___next__(PikaObj* self) {
 static int _str_get(char* str, int key_i, char* char_buff) {
     uint16_t len = strGetSize(str);
     if (key_i < 0) {
-        key_i = string_len(str) + key_i;
+        key_i = strGetSizeUtf8(str) + key_i;
     }
 #if PIKA_STRING_UTF8_ENABLE
     return _utf8_get(str, len, key_i, char_buff);
@@ -83,16 +84,6 @@ static int _str_get(char* str, int key_i, char* char_buff) {
 
 char* string_slice(Args* outBuffs, char* str, int start, int end) {
     char* res = args_getBuff(outBuffs, strGetSize(str));
-    if (start < 0) {
-        start += string_len(str);
-    }
-    /* magic code, to the end */
-    if (end == -99999) {
-        end = string_len(str);
-    }
-    if (end < 0) {
-        end += string_len(str);
-    }
     for (int i = start; i < end; i++) {
         char char_buff[5] = {0};
         int r = _str_get(str, i, char_buff);
@@ -251,24 +242,31 @@ PikaObj* PikaStdData_String_split(PikaObj* self, char* s) {
     Args buffs = {0};
     char* str = strsCopy(&buffs, obj_getStr(self, "str"));
 
-    char sign = s[0];
-    int token_num = strCountSign(str, sign) + 1;
+    /* split str with s by strstr() */
 
-    for (int i = 0; i < token_num; i++) {
-        char* token = strsPopToken(&buffs, &str, sign);
-        /* 用 arg_set<type> 的 api 创建 arg */
-        Arg* token_arg = arg_newStr(token);
-        /* 添加到 list 对象 */
-        PikaStdData_List_append(list, token_arg);
-        /* 销毁 arg */
-        arg_deinit(token_arg);
+    size_t spliter_len = strGetSize(s);
+    char* p = str;
+    while (1) {
+        char* q = strstr(p, s);
+        if (q == NULL) {
+            break;
+        }
+        *q = '\0';
+        Arg* arg_item = arg_newStr(p);
+        PikaStdData_List_append(list, arg_item);
+        arg_deinit(arg_item);
+        p = q + spliter_len;
     }
-
+    if (*p != '\0') {
+        Arg* arg_item = arg_newStr(p);
+        PikaStdData_List_append(list, arg_item);
+        arg_deinit(arg_item);
+    }
     strsDeinit(&buffs);
     return list;
 }
 
-static int string_len(char* str) {
+int strGetSizeUtf8(char* str) {
 #if PIKA_STRING_UTF8_ENABLE
     int n = _utf8_strlen(str, -1);
     return n;
@@ -279,7 +277,7 @@ static int string_len(char* str) {
 
 int PikaStdData_String___len__(PikaObj* self) {
     char* str = obj_getStr(self, "str");
-    int n = string_len(str);
+    int n = strGetSizeUtf8(str);
     if (n < 0) {
         obj_setErrorCode(self, __LINE__);
         __platform_printf("Error. Internal error(%d)\r\n", __LINE__);

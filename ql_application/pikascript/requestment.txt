@@ -1,7 +1,8 @@
 pikascript-core==latest
 PikaStdLib==latest
 PikaStdDevice==latest
-pika_libc==v1.0.0
+time==latest
+pika_libc==v1.0.1
 socket==latest
 hashlib==v1.0.1
 hmac==v1.0.1

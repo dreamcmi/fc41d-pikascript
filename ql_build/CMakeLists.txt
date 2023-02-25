@@ -416,6 +416,7 @@ file(GLOB pika_src
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-core/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdDevice/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdLib/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/time/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/pika_libc/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/socket/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/hashlib/*.c
@@ -430,6 +431,7 @@ list(APPEND pika_inc
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-core
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdDevice
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/PikaStdLib
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/time/
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/pika_libc
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/FC41D
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/socket

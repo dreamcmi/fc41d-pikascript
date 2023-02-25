@@ -30,6 +30,14 @@
         "stdarg.h": "c",
         "ql_uart.h": "c",
         "HELLO.C": "cpp",
-        "ql_i2c1_eeprom.h": "c"
+        "ql_i2c1_eeprom.h": "c",
+        "pikastddevice_spi.h": "c",
+        "_time.h": "c",
+        "_socket_socket.h": "c",
+        "pikaobj.h": "c",
+        "sys.h": "c",
+        "netdb.h": "c",
+        "api.h": "c",
+        "sockets.h": "c"
     }
 }

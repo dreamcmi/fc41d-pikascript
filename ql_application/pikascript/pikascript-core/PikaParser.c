@@ -55,8 +55,9 @@ void Cursor_iterEnd(struct Cursor* cs);
 void Cursor_deinit(struct Cursor* cs);
 
 /* Cursor high level api */
-char* Cursor_popToken(Args* buffs, char** stmt, char* devide);
+char* Cursor_popToken(Args* buffs, char** pStmt, char* devide);
 PIKA_BOOL Cursor_isContain(char* stmt, TokenType type, char* pyload);
+char* Cursor_splitCollect(Args* buffs, char* stmt, char* devide, int index);
 
 char* Parser_linesToAsm(Args* outBuffs, char* multiLine);
 uint16_t TokenStream_getSize(char* tokenStream) {
@@ -66,15 +67,12 @@ uint16_t TokenStream_getSize(char* tokenStream) {
     return strCountSign(tokenStream, 0x1F) + 1;
 }
 
-char* strsPopTokenWithSkip_byStr(Args* outBuffs,
-                                 char* stmts,
-                                 char* str,
-                                 char skipStart,
-                                 char skipEnd) {
+char* Cursor_popLastToken(Args* outBuffs, char** pStmt, char* str) {
+    char* stmts = *pStmt;
     uint8_t divider_index = 0;
     Arg* keeped_arg = arg_newStr("");
     Arg* poped_arg = arg_newStr("");
-    Cursor_forEachToken(cs, stmts) {
+    Cursor_forEach(cs, stmts) {
         Cursor_iterStart(&cs);
         if (cs.branket_deepth == 0) {
             if (strEqu(str, cs.token1.pyload)) {
@@ -84,7 +82,7 @@ char* strsPopTokenWithSkip_byStr(Args* outBuffs,
         Cursor_iterEnd(&cs);
     }
     Cursor_deinit(&cs);
-    Cursor_forEachTokenExistPs(cs, stmts) {
+    Cursor_forEachExistPs(cs, stmts) {
         Cursor_iterStart(&cs);
         if (cs.iter_index < divider_index) {
             poped_arg = arg_strAppend(poped_arg, cs.token1.pyload);
@@ -95,21 +93,21 @@ char* strsPopTokenWithSkip_byStr(Args* outBuffs,
         Cursor_iterEnd(&cs);
     }
     Cursor_deinit(&cs);
-    char* keeped = arg_getStr(keeped_arg);
-    char* poped = strsCopy(outBuffs, arg_getStr(poped_arg));
-    __platform_memcpy(stmts, keeped, strGetSize(keeped) + 1);
+    char* keeped = strsCopy(outBuffs, arg_getStr(keeped_arg));
+    char* poped = arg_getStr(poped_arg);
+    pika_platform_memcpy(stmts, poped, strGetSize(poped) + 1);
     arg_deinit(poped_arg);
     arg_deinit(keeped_arg);
-    return poped;
+    return keeped;
 }
 
-char* strsGetCleanCmd(Args* outBuffs, char* cmd) {
+char* Cursor_getCleanStmt(Args* outBuffs, char* cmd) {
     pika_assert(cmd != NULL);
     int32_t size = strGetSize(cmd);
     /* lexer may generate more chars than input */
     char* strOut = args_getBuff(outBuffs, size * 2);
     int32_t iOut = 0;
-    Cursor_forEachToken(cs, cmd) {
+    Cursor_forEach(cs, cmd) {
         Cursor_iterStart(&cs);
         for (uint16_t k = 0; k < strGetSize(cs.token1.pyload); k++) {
             strOut[iOut] = cs.token1.pyload[k];
@@ -144,7 +142,7 @@ static char* Cursor_removeTokensBetween(Args* outBuffs,
     Args buffs = {0};
     uint8_t block_deepth = 0;
     char* output = "";
-    Cursor_forEachToken(cs, input) {
+    Cursor_forEach(cs, input) {
         Cursor_iterStart(&cs);
         if (strEqu(token_pyload1, cs.token1.pyload)) {
             if (block_deepth == 0) {
@@ -193,7 +191,7 @@ static enum StmtType Lexer_matchStmtType(char* right) {
     PIKA_BOOL is_get_dict = PIKA_FALSE;
     PIKA_BOOL is_get_import = PIKA_FALSE;
     PIKA_BOOL is_get_chain = PIKA_FALSE;
-    Cursor_forEachToken(cs, rightWithoutSubStmt) {
+    Cursor_forEach(cs, rightWithoutSubStmt) {
         Cursor_iterStart(&cs);
         /* collect type */
         if (strEqu(cs.token1.pyload, " import ")) {
@@ -372,7 +370,8 @@ uint8_t Parser_checkIsDirect(char* str) {
     Args buffs = {0};
     uint8_t res = 0;
     pika_assert(NULL != str);
-    if (Cursor_isContain(str, TOKEN_operator, "=")) {
+    char* left = Cursor_splitCollect(&buffs, str, "=", 1);
+    if (!strEqu(left, str)) {
         res = 1;
         goto exit;
     }
@@ -413,8 +412,8 @@ Arg* Lexer_setSymbel(Arg* tokenStream_arg,
         goto exit;
     }
     symbol_buff = args_getBuff(&buffs, i - *symbol_start_index);
-    __platform_memcpy(symbol_buff, stmt + *symbol_start_index,
-                      i - *symbol_start_index);
+    pika_platform_memcpy(symbol_buff, stmt + *symbol_start_index,
+                         i - *symbol_start_index);
     /* literal */
     if ((symbol_buff[0] == '\'') || (symbol_buff[0] == '"')) {
         /* "" or '' */
@@ -791,6 +790,28 @@ exit:
     return res;
 }
 
+static char* _solveEqualLevelOperator(Args* buffs,
+                                      char*
+                                      operator,
+                                      char * op1,
+                                      char* op2,
+                                      char* stmt) {
+    if ((strEqu(operator, op1)) || (strEqu(operator, op2))) {
+        Cursor_forEach(cs, stmt) {
+            Cursor_iterStart(&cs);
+            if (strEqu(cs.token1.pyload, op1)) {
+                operator= strsCopy(buffs, op1);
+            }
+            if (strEqu(cs.token1.pyload, op2)) {
+                operator= strsCopy(buffs, op2);
+            }
+            Cursor_iterEnd(&cs);
+        }
+        Cursor_deinit(&cs);
+    }
+    return operator;
+}
+
 static const char operators[][9] = {
     "**", "~",  "*",  "/",    "%",     "//",    "+",    "-",
     ">>", "<<", "&",  "^",    "|",     "<",     "<=",   ">",
@@ -804,7 +825,7 @@ char* Lexer_getOperator(Args* outBuffs, char* stmt) {
 
     // use parse state foreach to get operator
     for (uint32_t i = 0; i < sizeof(operators) / 9; i++) {
-        Cursor_forEachToken(cs, tokenStream) {
+        Cursor_forEach(cs, tokenStream) {
             Cursor_iterStart(&cs);
             // get operator
             if (strEqu(cs.token2.pyload, (char*)operators[i])) {
@@ -820,7 +841,7 @@ char* Lexer_getOperator(Args* outBuffs, char* stmt) {
 
     /* solve the iuuse of "~-1" */
     if (strEqu(operator, "-")) {
-        Cursor_forEachToken(cs, stmt) {
+        Cursor_forEach(cs, stmt) {
             Cursor_iterStart(&cs);
             if (strEqu(cs.token2.pyload, "-")) {
                 if (cs.token1.type == TOKEN_operator) {
@@ -835,19 +856,8 @@ char* Lexer_getOperator(Args* outBuffs, char* stmt) {
     }
 
     /* match the last operator in equal level */
-    if ((strEqu(operator, "+")) || (strEqu(operator, "-"))) {
-        Cursor_forEachToken(cs, stmt) {
-            Cursor_iterStart(&cs);
-            if (strEqu(cs.token1.pyload, "+")) {
-                operator= strsCopy(&buffs, "+");
-            }
-            if (strEqu(cs.token1.pyload, "-")) {
-                operator= strsCopy(&buffs, "-");
-            }
-            Cursor_iterEnd(&cs);
-        }
-        Cursor_deinit(&cs);
-    }
+    operator= _solveEqualLevelOperator(&buffs, operator, "+", "-", stmt);
+    operator= _solveEqualLevelOperator(&buffs, operator, "*", "/", stmt);
     /* out put */
     if (NULL == operator) {
         return NULL;
@@ -969,11 +979,11 @@ PIKA_BOOL Cursor_isContain(char* stmt, TokenType type, char* pyload) {
     return res;
 }
 
-char* Cursor_popToken(Args* buffs, char** tokenStream, char* devide) {
+char* Cursor_popToken(Args* buffs, char** pStmt, char* devide) {
     Arg* out_item = arg_newStr("");
     Arg* tokenStream_after = arg_newStr("");
     PIKA_BOOL is_find_devide = PIKA_FALSE;
-    Cursor_forEachToken(cs, *tokenStream) {
+    Cursor_forEach(cs, *pStmt) {
         Cursor_iterStart(&cs);
         if (!is_find_devide) {
             if ((cs.branket_deepth == 0 && strEqu(cs.token1.pyload, devide)) ||
@@ -999,8 +1009,37 @@ char* Cursor_popToken(Args* buffs, char** tokenStream, char* devide) {
     char* token_after_str = strsCopy(buffs, arg_getStr(tokenStream_after));
     arg_deinit(tokenStream_after);
     /* update tokenStream */
-    *tokenStream = token_after_str;
+    *pStmt = token_after_str;
     return out_item_str;
+}
+
+char* Cursor_splitCollect(Args* buffs, char* stmt, char* devide, int index) {
+    Arg* aOut = arg_newStr("");
+    int expect_branket = 0;
+    if (devide[0] == '(' || devide[0] == '[' || devide[0] == '{') {
+        expect_branket = 1;
+    }
+    int i = 0;
+    Cursor_forEach(cs, stmt) {
+        Cursor_iterStart(&cs);
+        if (cs.branket_deepth == expect_branket &&
+            strEqu(cs.token1.pyload, devide)) {
+            i++;
+            Cursor_iterEnd(&cs);
+            continue;
+        }
+        if (i == index) {
+            aOut = arg_strAppend(aOut, cs.token1.pyload);
+        }
+        Cursor_iterEnd(&cs);
+    }
+    Cursor_deinit(&cs);
+    /* if not found, return origin string */
+    if (i == 0) {
+        arg_deinit(aOut);
+        aOut = arg_newStr(stmt);
+    }
+    return strsCacheArg(buffs, aOut);
 }
 
 static void Slice_getPars(Args* outBuffs,
@@ -1018,7 +1057,7 @@ static void Slice_getPars(Args* outBuffs,
 
     /* slice */
     uint8_t colon_i = 0;
-    Cursor_forEachToken(cs, inner) {
+    Cursor_forEach(cs, inner) {
         Cursor_iterStart(&cs);
         if (strEqu(cs.token1.pyload, ":") && cs.branket_deepth == 0) {
             colon_i++;
@@ -1082,7 +1121,7 @@ char* Suger_leftSlice(Args* outBuffs, char* right, char** left_p) {
     /* exit when not match
          (symble|iteral)'['
     */
-    Cursor_forEachToken(cs, left) {
+    Cursor_forEach(cs, left) {
         Cursor_iterStart(&cs);
         if (strEqu(cs.token2.pyload, "[")) {
             if (TOKEN_symbol == cs.token1.type ||
@@ -1103,7 +1142,7 @@ char* Suger_leftSlice(Args* outBuffs, char* right, char** left_p) {
     }
 
     /* matched [] */
-    Cursor_forEachTokenExistPs(cs, left) {
+    Cursor_forEachExistPs(cs, left) {
         Cursor_iterStart(&cs);
         /* found '[' */
         if ((TOKEN_devider == cs.token2.type) &&
@@ -1177,7 +1216,7 @@ char* Suger_format(Args* outBuffs, char* right) {
     }
 
     PIKA_BOOL is_format = PIKA_FALSE;
-    Cursor_forEachToken(ps1, right) {
+    Cursor_forEach(ps1, right) {
         Cursor_iterStart(&ps1);
         if (ps1.branket_deepth == 0 && strEqu(ps1.token1.pyload, "%")) {
             is_format = PIKA_TRUE;
@@ -1197,7 +1236,7 @@ char* Suger_format(Args* outBuffs, char* right) {
     PIKA_BOOL is_out_vars = PIKA_FALSE;
     Args buffs = {0};
     char* fmt = NULL;
-    Cursor_forEachToken(cs, right) {
+    Cursor_forEach(cs, right) {
         char* item = "";
         Cursor_iterStart(&cs);
         if (PIKA_FALSE == is_in_format) {
@@ -1300,7 +1339,7 @@ uint8_t Suger_selfOperator(Args* outbuffs,
     }
     /* found self operator */
     is_left_exist = 1;
-    Cursor_forEachToken(cs, stmt) {
+    Cursor_forEach(cs, stmt) {
         Cursor_iterStart(&cs);
         if ((strEqu(cs.token1.pyload, "*=")) ||
             (strEqu(cs.token1.pyload, "/=")) ||
@@ -1373,7 +1412,7 @@ char* Parser_popSubStmt(Args* outbuffs, char** stmt_p, char* delimiter) {
     char* stmt = *stmt_p;
     PIKA_BOOL is_get_substmt = PIKA_FALSE;
     Args buffs = {0};
-    Cursor_forEachToken(cs, stmt) {
+    Cursor_forEach(cs, stmt) {
         Cursor_iterStart(&cs);
         if (is_get_substmt) {
             /* get new stmt */
@@ -1410,7 +1449,7 @@ char* Parser_popSubStmt(Args* outbuffs, char** stmt_p, char* delimiter) {
 char* Parser_popLastSubStmt(Args* outbuffs, char** stmt_p, char* delimiter) {
     uint8_t last_stmt_i = 0;
     char* stmt = *stmt_p;
-    Cursor_forEachToken(cs, stmt) {
+    Cursor_forEach(cs, stmt) {
         Cursor_iterStart(&cs);
         if (strIsStartWith(cs.token1.pyload, delimiter)) {
             /* found delimiter */
@@ -1436,7 +1475,7 @@ char* Parser_popLastSubStmt(Args* outbuffs, char** stmt_p, char* delimiter) {
     Arg* mainStmt = arg_newStr("");
     Arg* lastStmt = arg_newStr("");
     {
-        Cursor_forEachToken(cs, stmt) {
+        Cursor_forEach(cs, stmt) {
             Cursor_iterStart(&cs);
             if (cs.iter_index < last_stmt_i) {
                 mainStmt = arg_strAppend(mainStmt, cs.token1.pyload);
@@ -1522,6 +1561,10 @@ char* Suger_not_in(Args* out_buffs, char* line) {
     return line;
 #endif
     char* ret = line;
+    char* stmt1 = "";
+    char* stmt2 = "";
+    PIKA_BOOL got_not_in = PIKA_FALSE;
+    PIKA_BOOL skip = PIKA_FALSE;
     Args buffs = {0};
     if (!Cursor_isContain(line, TOKEN_operator, " not ")) {
         ret = line;
@@ -1531,24 +1574,21 @@ char* Suger_not_in(Args* out_buffs, char* line) {
         ret = line;
         goto __exit;
     }
-    char* stmt1 = "";
-    char* stmt2 = "";
-    PIKA_BOOL got_not_in = 0;
-    PIKA_BOOL skip = 0;
+
     /* stmt1 not in stmt2 => not stmt1 in stmt2 */
-    Cursor_forEachToken(cs, line) {
+    Cursor_forEach(cs, line) {
         Cursor_iterStart(&cs);
         if (!got_not_in) {
             if (strEqu(cs.token1.pyload, " not ") &&
                 strEqu(cs.token2.pyload, " in ")) {
-                got_not_in = 1;
+                got_not_in = PIKA_TRUE;
                 Cursor_iterEnd(&cs);
                 continue;
             }
             stmt1 = strsAppend(&buffs, stmt1, cs.token1.pyload);
         } else {
             if (!skip) {
-                skip = 1;
+                skip = PIKA_TRUE;
                 Cursor_iterEnd(&cs);
                 continue;
             }
@@ -1571,7 +1611,7 @@ __exit:
 
 AST* AST_parseStmt(AST* ast, char* stmt) {
     Args buffs = {0};
-    char* assignment = strsGetFirstToken(&buffs, stmt, '(');
+    char* assignment = Cursor_splitCollect(&buffs, stmt, "(", 0);
     char* method = NULL;
     char* ref = NULL;
     char* str = NULL;
@@ -1589,7 +1629,7 @@ AST* AST_parseStmt(AST* ast, char* stmt) {
         left = strsCopy(&buffs, "");
         right = strsCopy(&buffs, "");
         uint8_t is_meet_equ = 0;
-        Cursor_forEachToken(cs, stmt) {
+        Cursor_forEach(cs, stmt) {
             Cursor_iterStart(&cs);
             if (!is_meet_equ && strEqu(cs.token1.pyload, "=") &&
                 cs.token1.type == TOKEN_operator) {
@@ -1618,7 +1658,8 @@ AST* AST_parseStmt(AST* ast, char* stmt) {
 
     /* set left */
     if (isLeftExist) {
-        AST_setNodeAttr(ast, (char*)"left", left);
+        char* left_without_hint = Cursor_splitCollect(&buffs, left, ":", 0);
+        AST_setNodeAttr(ast, (char*)"left", left_without_hint);
     }
     /* match statment type */
     enum StmtType stmtType = Lexer_matchStmtType(right);
@@ -1637,9 +1678,8 @@ AST* AST_parseStmt(AST* ast, char* stmt) {
         }
         AST_setNodeAttr(ast, (char*)"operator", operator);
         char* rightBuff = strsCopy(&buffs, right);
-        char* subStmt1 =
-            strsPopTokenWithSkip_byStr(&buffs, rightBuff, operator, '(', ')');
-        char* subStmt2 = rightBuff;
+        char* subStmt2 = Cursor_popLastToken(&buffs, &rightBuff, operator);
+        char* subStmt1 = rightBuff;
         AST_parseSubStmt(ast, subStmt1);
         AST_parseSubStmt(ast, subStmt2);
         goto exit;
@@ -1677,7 +1717,10 @@ AST* AST_parseStmt(AST* ast, char* stmt) {
         method = strsGetFirstToken(&buffs, right, '(');
         AST_setNodeAttr(ast, (char*)"method", method);
         char* subStmts = strsCut(&buffs, right, '(', ')');
-        pika_assert(NULL != subStmts);
+        if (NULL == subStmts) {
+            result = PIKA_RES_ERR_SYNTAX_ERROR;
+            goto exit;
+        }
         /* add ',' at the end */
         subStmts = strsAppend(&buffs, subStmts, ",");
         while (1) {
@@ -1739,19 +1782,23 @@ exit:
     return ast;
 }
 
-static int32_t Parser_getPyLineBlockDeepth(char* line) {
+static int32_t _getSpaceNum(char* line) {
     uint32_t size = strGetSize(line);
     for (uint32_t i = 0; i < size; i++) {
         if (line[i] != ' ') {
-            uint32_t spaceNum = i;
-            if (0 == spaceNum % 4) {
-                return spaceNum / 4;
-            }
-            /* space Num is not 4N, error*/
-            return -1;
+            return i;
         }
     }
     return 0;
+}
+
+static int32_t Parser_getPyLineBlockDeepth(char* line) {
+    int32_t spaceNum = _getSpaceNum(line);
+    if (0 == spaceNum % 4) {
+        return spaceNum / 4;
+    }
+    /* space Num is not 4N, error*/
+    return -1;
 }
 
 char* Parser_removeAnnotation(char* line) {
@@ -1793,50 +1840,59 @@ char* Parser_removeAnnotation(char* line) {
     return line;
 }
 
-char* _defGetDefault(Args* outBuffs, char** dec_out) {
+char* _defGetDefault(Args* outBuffs, char** psDeclearOut) {
 #if PIKA_NANO_ENABLE
     return "";
 #endif
     Args buffs = {0};
-    char* dec_str = strsCopy(&buffs, *dec_out);
-    char* fn_name = strsGetFirstToken(&buffs, dec_str, '(');
-    Arg* dec_arg = arg_strAppend(arg_newStr(fn_name), "(");
-    Arg* default_arg = arg_newStr("");
-    char* arg_list = strsCut(&buffs, dec_str, '(', ')');
-    char* default_out = NULL;
-    pika_assert(NULL != arg_list);
-    int arg_num = strCountSign(arg_list, ',') + 1;
-    for (int i = 0; i < arg_num; i++) {
-        char* arg_str = strsPopToken(&buffs, &arg_list, ',');
+    char* sDeclear = strsCopy(&buffs, *psDeclearOut);
+    char* sFnName = strsGetFirstToken(&buffs, sDeclear, '(');
+    Arg* aDeclear = arg_strAppend(arg_newStr(sFnName), "(");
+    Arg* aDefault = arg_newStr("");
+    char* sArgList = strsCut(&buffs, sDeclear, '(', ')');
+    char* sDefaultOut = NULL;
+    pika_assert(NULL != sArgList);
+    int argNum = strCountSign(sArgList, ',') + 1;
+    for (int i = 0; i < argNum; i++) {
+        char* sItem = strsPopToken(&buffs, &sArgList, ',');
+        char* sDefaultVal = NULL;
+        char* sDefaultKey = NULL;
         int is_default = 0;
-        if (strIsContain(arg_str, '=')) {
-            default_arg = arg_strAppend(default_arg, arg_str);
-            default_arg = arg_strAppend(default_arg, ",");
-            arg_str = strsPopToken(&buffs, &arg_str, '=');
+        if (strIsContain(sItem, '=')) {
+            /* has default value */
+            sDefaultVal = Cursor_splitCollect(&buffs, sItem, "=", 1);
+            sDefaultKey = Cursor_splitCollect(&buffs, sItem, "=", 0);
+            sDefaultKey = Cursor_splitCollect(&buffs, sDefaultKey, ":", 0);
+            aDefault = arg_strAppend(aDefault, sDefaultKey);
+            aDefault = arg_strAppend(aDefault, "=");
+            aDefault = arg_strAppend(aDefault, sDefaultVal);
+            aDefault = arg_strAppend(aDefault, ",");
             is_default = 1;
+        } else {
+            sDefaultKey = sItem;
         }
-        dec_arg = arg_strAppend(dec_arg, arg_str);
+        aDeclear = arg_strAppend(aDeclear, sDefaultKey);
         if (is_default) {
-            dec_arg = arg_strAppend(dec_arg, "=");
+            aDeclear = arg_strAppend(aDeclear, "=");
         }
-        dec_arg = arg_strAppend(dec_arg, ",");
+        aDeclear = arg_strAppend(aDeclear, ",");
     }
-    strPopLastToken(arg_getStr(dec_arg), ',');
-    dec_arg = arg_strAppend(dec_arg, ")");
-    *dec_out = strsCopy(outBuffs, arg_getStr(dec_arg));
-    default_out = strsCopy(outBuffs, arg_getStr(default_arg));
-    strPopLastToken(default_out, ',');
-    arg_deinit(dec_arg);
-    arg_deinit(default_arg);
+    strPopLastToken(arg_getStr(aDeclear), ',');
+    aDeclear = arg_strAppend(aDeclear, ")");
+    *psDeclearOut = strsCopy(outBuffs, arg_getStr(aDeclear));
+    sDefaultOut = strsCopy(outBuffs, arg_getStr(aDefault));
+    strPopLastToken(sDefaultOut, ',');
+    arg_deinit(aDeclear);
+    arg_deinit(aDefault);
     strsDeinit(&buffs);
-    return default_out;
+    return sDefaultOut;
 }
 
 static char* Suger_multiReturn(Args* out_buffs, char* line) {
 #if PIKA_NANO_ENABLE
     return line;
 #endif
-    Cursor_forEachToken(cs, line) {
+    Cursor_forEach(cs, line) {
         Cursor_iterStart(&cs);
         if (cs.branket_deepth == 0 && strEqu(cs.token1.pyload, ",")) {
             line = strsFormat(out_buffs, strGetSize(line) + 3, "(%s)", line);
@@ -1877,7 +1933,7 @@ AST* AST_parseLine_withBlockStack_withBlockDeepth(char* line,
     /* set block deepth */
     if (block_deepth_now == -1) {
         /* get block_deepth error */
-        __platform_printf(
+        pika_platform_printf(
             "IndentationError: unexpected indent, only support 4 "
             "spaces\r\n");
         obj_deinit(ast);
@@ -1938,7 +1994,7 @@ AST* AST_parseLine_withBlockStack_withBlockDeepth(char* line,
     if (strIsStartWith(line_start, "for ")) {
         Args* list_buffs = New_strBuff();
         char* line_buff = strsCopy(list_buffs, line_start + 4);
-        line_buff = strsGetCleanCmd(list_buffs, line_buff);
+        line_buff = Cursor_getCleanStmt(list_buffs, line_buff);
         if (strCountSign(line_buff, ':') < 1) {
             args_deinit(list_buffs);
             obj_deinit(ast);
@@ -2042,7 +2098,7 @@ AST* AST_parseLine_withBlockStack_withBlockDeepth(char* line,
     if (strIsStartWith(line_start, "global ")) {
         stmt = "";
         char* global_list = line_start + 7;
-        global_list = strsGetCleanCmd(&buffs, global_list);
+        global_list = Cursor_getCleanStmt(&buffs, global_list);
         AST_setNodeAttr(ast, "global", global_list);
         goto block_matched;
     }
@@ -2055,7 +2111,7 @@ AST* AST_parseLine_withBlockStack_withBlockDeepth(char* line,
         } else {
             del_dir = line_start + sizeof("del ") - 1;
         }
-        del_dir = strsGetCleanCmd(&buffs, del_dir);
+        del_dir = Cursor_getCleanStmt(&buffs, del_dir);
         AST_setNodeAttr(ast, "del", del_dir);
         goto block_matched;
     }
@@ -2067,7 +2123,7 @@ AST* AST_parseLine_withBlockStack_withBlockDeepth(char* line,
             ast = NULL;
             goto exit;
         }
-        declare = strsGetCleanCmd(&buffs, declare);
+        declare = Cursor_getCleanStmt(&buffs, declare);
         if (!strIsContain(declare, '(') || !strIsContain(declare, ')')) {
             obj_deinit(ast);
             ast = NULL;
@@ -2090,7 +2146,7 @@ AST* AST_parseLine_withBlockStack_withBlockDeepth(char* line,
             ast = NULL;
             goto exit;
         }
-        declare = strsGetCleanCmd(&buffs, declare);
+        declare = Cursor_getCleanStmt(&buffs, declare);
         AST_setNodeBlock(ast, "class");
         AST_setNodeAttr(ast, "declare", declare);
         stack_pushStr(block_stack, "class");
@@ -2103,7 +2159,7 @@ block_matched:
         ast = NULL;
         goto exit;
     }
-    stmt = strsGetCleanCmd(&buffs, stmt);
+    stmt = Cursor_getCleanStmt(&buffs, stmt);
     ast = AST_parseStmt(ast, stmt);
     goto exit;
 exit:
@@ -2166,7 +2222,7 @@ static PIKA_BOOL _check_is_multi_assign(char* arg_list) {
     return PIKA_FALSE;
 #endif
     PIKA_BOOL res = PIKA_FALSE;
-    Cursor_forEachToken(cs, arg_list) {
+    Cursor_forEach(cs, arg_list) {
         Cursor_iterStart(&cs);
         if ((cs.branket_deepth == 0 && strEqu(cs.token1.pyload, ","))) {
             res = PIKA_TRUE;
@@ -2183,6 +2239,7 @@ static char* Suger_multiAssign(Args* out_buffs, char* line) {
 #endif
     Args buffs = {0};
     char* line_out = line;
+    int space_num = _getSpaceNum(line);
     PIKA_BOOL is_assign = PIKA_FALSE;
     Arg* stmt = arg_newStr("");
     Arg* out_list = arg_newStr("");
@@ -2191,7 +2248,7 @@ static char* Suger_multiAssign(Args* out_buffs, char* line) {
     char* line_item = NULL;
     char* out_list_str = NULL;
     int out_num = 0;
-    Cursor_forEachToken(cs, line) {
+    Cursor_forEach(cs, line) {
         Cursor_iterStart(&cs);
         if (cs.branket_deepth == 0 && strEqu(cs.token1.pyload, "=")) {
             is_assign = PIKA_TRUE;
@@ -2219,6 +2276,11 @@ static char* Suger_multiAssign(Args* out_buffs, char* line) {
 
     line_item =
         strsFormat(&buffs, PIKA_LINE_BUFF_SIZE, "$tmp= %s\n", arg_getStr(stmt));
+
+    /* add space */
+    for (int i = 0; i < space_num; i++) {
+        line_out_arg = arg_strAppend(line_out_arg, " ");
+    }
     line_out_arg = arg_strAppend(line_out_arg, line_item);
 
     out_list_str = arg_getStr(out_list);
@@ -2229,8 +2291,16 @@ static char* Suger_multiAssign(Args* out_buffs, char* line) {
         }
         char* line_item = strsFormat(&buffs, PIKA_LINE_BUFF_SIZE,
                                      "%s = $tmp[%d]\n", item, out_num);
+        /* add space */
+        for (int i = 0; i < space_num; i++) {
+            line_out_arg = arg_strAppend(line_out_arg, " ");
+        }
         line_out_arg = arg_strAppend(line_out_arg, line_item);
         out_num++;
+    }
+    /* add space */
+    for (int i = 0; i < space_num; i++) {
+        line_out_arg = arg_strAppend(line_out_arg, " ");
     }
     line_out_arg = arg_strAppend(line_out_arg, "del $tmp");
 
@@ -2254,6 +2324,8 @@ static char* Suger_from_import_as(Args* buffs_p, char* line) {
     char* module = NULL;
     char* alias = NULL;
     char* stmt = line + 5;
+    char* class_after = "";
+
     if (!strIsStartWith(line, "from ")) {
         line_out = line;
         goto exit;
@@ -2277,7 +2349,6 @@ static char* Suger_from_import_as(Args* buffs_p, char* line) {
         goto exit;
     }
 
-    char* class_after = "";
     while (1) {
         char* class_item = Cursor_popToken(&buffs, &class, ",");
         if (class_item[0] == '\0') {
@@ -2339,6 +2410,7 @@ static char* Suger_import(Args* outbuffs, char* line) {
 static char* Parser_linePreProcess(Args* outbuffs, char* line) {
     line = Parser_removeAnnotation(line);
     Arg* line_buff = NULL;
+    int line_num = 0;
     /* check syntex error */
     if (Lexer_isError(line)) {
         line = NULL;
@@ -2350,7 +2422,7 @@ static char* Parser_linePreProcess(Args* outbuffs, char* line) {
     line = Suger_import(outbuffs, line);
 
     /* process multi assign */
-    int line_num = strCountSign(line, '\n') + 1;
+    line_num = strCountSign(line, '\n') + 1;
     line_buff = arg_newStr("");
     for (int i = 0; i < line_num; i++) {
         if (i > 0) {
@@ -2489,7 +2561,7 @@ static char* _Parser_linesToBytesOrAsm(Args* outBuffs,
             line_connection_arg = arg_strAppend(line_connection_arg, line);
             goto next_line;
         }
-        Cursor_forEachToken(c, line) {
+        Cursor_forEach(c, line) {
             Cursor_iterStart(&c);
             Cursor_iterEnd(&c);
         }
@@ -2536,6 +2608,7 @@ static char* _Parser_linesToBytesOrAsm(Args* outBuffs,
     parse_after:
         if (NULL == single_ASM) {
             out_ASM = NULL;
+            pika_platform_printf("------\r\n%s\r\n------\r\n", line);
             strsDeinit(&buffs);
             goto exit;
         }
@@ -2580,9 +2653,9 @@ exit:
 
 PIKA_RES Parser_linesToBytes(ByteCodeFrame* bf, char* py_lines) {
 #if PIKA_BYTECODE_ONLY_ENABLE
-    __platform_printf(
+    pika_platform_printf(
         "Error: In bytecode-only mode, can not parse python script.\r\n");
-    __platform_printf(
+    pika_platform_printf(
         " Note: Please check PIKA_BYTECODE_ONLY_ENABLE config.\r\n");
     return PIKA_RES_ERR_SYNTAX_ERROR;
 #else
@@ -2653,7 +2726,7 @@ char* AST_genAsm_sub(AST* ast, AST* subAst, Args* outBuffs, char* pikaAsm) {
         char* astNodeVal = obj_getStr(subAst, rule.ast);
         if (NULL != astNodeVal) {
             /* e.g. "0 RUN print \n" */
-            __platform_sprintf(buff, "%d %s ", deepth, rule.ins);
+            pika_platform_sprintf(buff, "%d %s ", deepth, rule.ins);
             Arg* abuff = arg_newStr(buff);
             if (rule.type == VAL_DYNAMIC) {
                 abuff = arg_strAppend(abuff, astNodeVal);
@@ -2694,7 +2767,7 @@ char* GenRule_toAsm(GenRule rule,
     /* parse stmt ast */
     pikaAsm = AST_genAsm_sub(ast, ast, buffs, pikaAsm);
     /* e.g. "0 CTN \n" */
-    __platform_sprintf(buff, "%d %s ", deepth, rule.ins);
+    pika_platform_sprintf(buff, "%d %s ", deepth, rule.ins);
     Arg* abuff = arg_newStr(buff);
     if (rule.type == VAL_DYNAMIC) {
         abuff = arg_strAppend(abuff, obj_getStr(ast, rule.ast));
@@ -2759,10 +2832,6 @@ char* AST_genAsm(AST* ast, Args* outBuffs) {
                 pikaAsm = strsAppend(outBuffs, pikaAsm, (char*)"0 NTR \n");
                 pikaAsm = strsAppend(outBuffs, pikaAsm, (char*)"0 GER \n");
                 pikaAsm = strsAppend(outBuffs, pikaAsm, (char*)"0 JEZ 2\n");
-            }
-
-            if (strEqu(block_type, "except")) {
-                pikaAsm = strsAppend(outBuffs, pikaAsm, (char*)"0 SER 0\n");
             }
 #endif
             /* goto the while start when exit while block */
@@ -3112,14 +3181,14 @@ char* Parser_linesToArray(char* lines) {
     /* do something */
     byteCodeFrame_print(&bytecode_frame);
 
-    __platform_printf("\n\n/* clang-format off */\n");
-    __platform_printf("PIKA_PYTHON(\n");
-    __platform_printf("%s\n", lines);
-    __platform_printf(")\n");
-    __platform_printf("/* clang-format on */\n");
+    pika_platform_printf("\n\n/* clang-format off */\n");
+    pika_platform_printf("PIKA_PYTHON(\n");
+    pika_platform_printf("%s\n", lines);
+    pika_platform_printf(")\n");
+    pika_platform_printf("/* clang-format on */\n");
     byteCodeFrame_printAsArray(&bytecode_frame);
     /* deinit */
     byteCodeFrame_deinit(&bytecode_frame);
-    __platform_printf("\n\n");
+    pika_platform_printf("\n\n");
     return NULL;
 }

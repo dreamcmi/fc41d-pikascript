@@ -25,7 +25,7 @@ Arg* PikaStdDevice_GPIO(PikaObj *self);
 Arg* PikaStdDevice_IIC(PikaObj *self);
 Arg* PikaStdDevice_PWM(PikaObj *self);
 Arg* PikaStdDevice_SPI(PikaObj *self);
-Arg* PikaStdDevice_Time(PikaObj *self);
+PikaObj* PikaStdDevice_Time(PikaObj *self);
 Arg* PikaStdDevice_UART(PikaObj *self);
 
 #endif

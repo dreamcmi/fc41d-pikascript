@@ -19,11 +19,12 @@ PikaObj *New_PikaStdLib_SysObj(Args *args);
 
 Arg* PikaStdLib_SysObj___getitem__(PikaObj *self, Arg* obj, Arg* key);
 Arg* PikaStdLib_SysObj___setitem__(PikaObj *self, Arg* obj, Arg* key, Arg* val);
+PIKA_BOOL PikaStdLib_SysObj_bool(PikaObj *self, Arg* arg);
 Arg* PikaStdLib_SysObj_bytes(PikaObj *self, Arg* val);
 char* PikaStdLib_SysObj_cformat(PikaObj *self, char* fmt, PikaTuple* var);
 char* PikaStdLib_SysObj_chr(PikaObj *self, int val);
 Arg* PikaStdLib_SysObj_dict(PikaObj *self, PikaTuple* val);
-PikaObj* PikaStdLib_SysObj_dir(PikaObj *self, PikaObj* obj);
+PikaObj* PikaStdLib_SysObj_dir(PikaObj *self, Arg* obj);
 Arg* PikaStdLib_SysObj_eval(PikaObj *self, char* code);
 void PikaStdLib_SysObj_exec(PikaObj *self, char* code);
 void PikaStdLib_SysObj_exit(PikaObj *self);
@@ -42,8 +43,10 @@ PikaObj* PikaStdLib_SysObj_open(PikaObj *self, char* path, char* mode);
 int PikaStdLib_SysObj_ord(PikaObj *self, char* val);
 void PikaStdLib_SysObj_print(PikaObj *self, PikaTuple* val, PikaDict* ops);
 Arg* PikaStdLib_SysObj_range(PikaObj *self, PikaTuple* ax);
+void PikaStdLib_SysObj_reboot(PikaObj *self);
 void PikaStdLib_SysObj_setattr(PikaObj *self, PikaObj* obj, char* name, Arg* val);
 char* PikaStdLib_SysObj_str(PikaObj *self, Arg* arg);
+Arg* PikaStdLib_SysObj_tuple(PikaObj *self, Arg* arg);
 Arg* PikaStdLib_SysObj_type(PikaObj *self, Arg* arg);
 
 #endif
