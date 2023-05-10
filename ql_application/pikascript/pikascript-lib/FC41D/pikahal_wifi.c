@@ -16,7 +16,7 @@ static volatile PIKA_HAL_WIFI_STATUS wifi_sta_disconn_reason =
 static volatile ql_wlanInterface_Typedef_e wlan_mode = QL_STATION;
 static ql_network_InitTypeDef_s wifi_config = {0};
 
-static void wlan_status(ql_wlan_evt_type* ctxt) {
+static void wlan_status_cb(ql_wlan_evt_type* ctxt) {
     switch (*ctxt) {
         case QL_WLAN_EVT_STA_IDLE:
             wifi_sta_disconn_reason = PIKA_HAL_WIFI_STATUS_IDLE;
@@ -83,7 +83,7 @@ int pika_hal_platform_WIFI_ioctl_enable(pika_dev* dev) {
         pika_platform_printf("Error: unknow mode enable:%d\r\n", cfg->mode);
         return -1;
     }
-    return ql_wlan_status_register_cb(wlan_status);
+    return ql_wlan_status_register_cb(wlan_status_cb);
 }
 
 int pika_hal_platform_WIFI_ioctl_disable(pika_dev* dev) {
