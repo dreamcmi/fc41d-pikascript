@@ -22,6 +22,7 @@ PikaObj *pikaScriptInit(void){
     __platform_printf("base64==v1.0.0\r\n");
     __platform_printf("hashlib==v1.0.1\r\n");
     __platform_printf("hmac==v1.0.1\r\n");
+    __platform_printf("network==v0.1.2\r\n");
     __platform_printf("pika_libc==v1.0.2\r\n");
     __platform_printf("socket==v0.1.4\r\n");
     __platform_printf("time==v0.1.5\r\n");
@@ -40,6 +41,7 @@ PikaObj *pikaScriptInit(void){
             "import hmac\n"
             "import base64\n"
             "import time\n"
+            "import network\n"
             "mem = PikaStdLib.MemChecker()\n"
             "print('hello pikascript on FC41D')\n"
             "print('mem.max :')\n"
@@ -54,18 +56,18 @@ PikaObj *pikaScriptInit(void){
             "def cb1(signal):\n"
             "    print('cb1', signal)\n"
             "G1.setCallBack(cb1, G1.SIGNAL_RISING)\n"
-            "# G2 = std.GPIO()\n"
-            "# G2.setPin('23')\n"
-            "# G2.setMode('out')\n"
-            "# G2.enable()\n"
-            "# G2.low()\n"
+            "wlan = network.WLAN(network.STA_IF)\n"
+            "wlan.active(True)\n"
+            "wlan.connect(\"AR300M-NOR\", \"goodlife\")\n"
+            "while wlan.isconnected() == 0:\n"
+            "    pass\n"
             "#################\n"
             "print(\"socket test begin\")\n"
             "print(\"当前占用内存:\",mem.now())\n"
             "s = socket.socket()\n"
             "s.setblocking(False) \n"
             "host = \"112.125.89.8\"\n"
-            "port = 36582\n"
+            "port = 37803\n"
             "s.connect((host, port))\n"
             "print(\"连接成功占用内存:\",mem.now())\n"
             "s.send(\"hello pika from fc41d\")\n"
@@ -78,18 +80,8 @@ PikaObj *pikaScriptInit(void){
             "del s\n"
             "print(\"清理现场占用内存:\",mem.now())\n"
             "#################\n"
-            "# a1 = std.ADC()\n"
-            "# a1.setPin('1')\n"
-            "# a1.enable()\n"
             "while True:\n"
             "    mem.now()\n"
-            "    G1.read()\n"
-            "    # if i :\n"
-            "    #     print(\"G1 high\")\n"
-            "    # else:\n"
-            "    #     print(\"G1 low\")\n"
-            "    # a1.read()\n"
-            "    # mem.now()\n"
             "    time.sleep_ms(1000)\n"
             "\n");
 #else 

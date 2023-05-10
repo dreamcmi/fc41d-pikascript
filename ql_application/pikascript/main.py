@@ -6,7 +6,7 @@ import hashlib
 import hmac
 import base64
 import time
-
+import network
 
 mem = PikaStdLib.MemChecker()
 
@@ -22,18 +22,17 @@ G1.setMode('in')
 G1.enable()
 G1.low()
 
-
 def cb1(signal):
     print('cb1', signal)
 
-
 G1.setCallBack(cb1, G1.SIGNAL_RISING)
 
-# G2 = std.GPIO()
-# G2.setPin('23')
-# G2.setMode('out')
-# G2.enable()
-# G2.low()
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect("AR300M-NOR", "goodlife")
+while wlan.isconnected() == 0:
+    pass
+
 
 #################
 print("socket test begin")
@@ -41,7 +40,7 @@ print("当前占用内存:",mem.now())
 s = socket.socket()
 s.setblocking(False) 
 host = "112.125.89.8"
-port = 36582
+port = 37803
 s.connect((host, port))
 print("连接成功占用内存:",mem.now())
 s.send("hello pika from fc41d")
@@ -55,17 +54,6 @@ del s
 print("清理现场占用内存:",mem.now())
 #################
 
-# a1 = std.ADC()
-# a1.setPin('1')
-# a1.enable()
-
 while True:
     mem.now()
-    G1.read()
-    # if i :
-    #     print("G1 high")
-    # else:
-    #     print("G1 low")
-    # a1.read()
-    # mem.now()
     time.sleep_ms(1000)

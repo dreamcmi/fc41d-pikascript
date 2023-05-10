@@ -23,6 +23,7 @@
 #include "_base64.h"
 #include "_hashlib.h"
 #include "_hmac.h"
+#include "_network.h"
 #include "_socket.h"
 #include "_time.h"
 #include "PikaStdData.h"
@@ -89,6 +90,10 @@
 #include "_hmac.h"
 #include "TinyObj.h"
 #include "_hmac_HMAC.h"
+#include "TinyObj.h"
+#include "_network.h"
+#include "TinyObj.h"
+#include "_network_WLAN.h"
 #include "TinyObj.h"
 #include "_socket.h"
 #include "TinyObj.h"
@@ -170,6 +175,7 @@ PikaObj *New_PikaMain(Args *args){
     obj_newObj(self, "_base64", "_base64", New__base64);
     obj_newObj(self, "_hashlib", "_hashlib", New__hashlib);
     obj_newObj(self, "_hmac", "_hmac", New__hmac);
+    obj_newObj(self, "_network", "_network", New__network);
     obj_newObj(self, "_socket", "_socket", New__socket);
     obj_newObj(self, "_time", "_time", New__time);
     obj_setClass(self, PikaMain);
@@ -3855,6 +3861,211 @@ PikaObj *New__hmac_HMAC(Args *args){
 
 Arg *_hmac_HMAC(PikaObj *self){
     return obj_newObjInPackage(New__hmac_HMAC);
+}
+#endif
+
+#ifndef PIKA_MODULE__NETWORK_DISABLE
+void _network_WLANMethod(PikaObj *self, Args *args){
+    Arg* res = _network_WLAN(self);
+    method_returnArg(args, res);
+}
+method_typedef(
+    _network_WLAN,
+    "WLAN", ""
+);
+
+void _network___init__Method(PikaObj *self, Args *args){
+    _network___init__(self);
+}
+method_typedef(
+    _network___init__,
+    "__init__", ""
+);
+
+class_def(_network){
+    __BEFORE_MOETHOD_DEF
+    method_def(_network___init__, 904762485),
+    constructor_def(_network_WLAN, 2089685111),
+};
+class_inhert(_network, TinyObj);
+
+PikaObj *New__network(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, _network);
+    return self;
+}
+#endif
+
+#ifndef PIKA_MODULE__NETWORK_DISABLE
+void _network_WLAN___init__Method(PikaObj *self, Args *args){
+    int interface_id = args_getInt(args, "interface_id");
+    _network_WLAN___init__(self, interface_id);
+}
+method_typedef(
+    _network_WLAN___init__,
+    "__init__", "interface_id"
+);
+
+void _network_WLAN_activeMethod(PikaObj *self, Args *args){
+    int is_active = args_getInt(args, "is_active");
+    _network_WLAN_active(self, is_active);
+}
+method_typedef(
+    _network_WLAN_active,
+    "active", "is_active"
+);
+
+void _network_WLAN_checkActiveMethod(PikaObj *self, Args *args){
+    int res = _network_WLAN_checkActive(self);
+    method_returnInt(args, res);
+}
+method_typedef(
+    _network_WLAN_checkActive,
+    "checkActive", ""
+);
+
+void _network_WLAN_checkConfigMethod(PikaObj *self, Args *args){
+    char* param = args_getStr(args, "param");
+    Arg* res = _network_WLAN_checkConfig(self, param);
+    method_returnArg(args, res);
+}
+method_typedef(
+    _network_WLAN_checkConfig,
+    "checkConfig", "param"
+);
+
+void _network_WLAN_checkIfconfigMethod(PikaObj *self, Args *args){
+    PikaObj* res = _network_WLAN_checkIfconfig(self);
+    method_returnObj(args, res);
+}
+method_typedef(
+    _network_WLAN_checkIfconfig,
+    "checkIfconfig", ""
+);
+
+void _network_WLAN_closeMethod(PikaObj *self, Args *args){
+    _network_WLAN_close(self);
+}
+method_typedef(
+    _network_WLAN_close,
+    "close", ""
+);
+
+void _network_WLAN_configMethod(PikaObj *self, Args *args){
+    PikaDict* kwargs = args_getDict(args, "kwargs");
+    _network_WLAN_config(self, kwargs);
+}
+method_typedef(
+    _network_WLAN_config,
+    "config", "**kwargs"
+);
+
+void _network_WLAN_connectMethod(PikaObj *self, Args *args){
+    char* ssid = args_getStr(args, "ssid");
+    char* key = args_getStr(args, "key");
+    _network_WLAN_connect(self, ssid, key);
+}
+method_typedef(
+    _network_WLAN_connect,
+    "connect", "ssid,key"
+);
+
+void _network_WLAN_connectWithBssidMethod(PikaObj *self, Args *args){
+    char* ssid = args_getStr(args, "ssid");
+    char* key = args_getStr(args, "key");
+    char* bssid = args_getStr(args, "bssid");
+    _network_WLAN_connectWithBssid(self, ssid, key, bssid);
+}
+method_typedef(
+    _network_WLAN_connectWithBssid,
+    "connectWithBssid", "ssid,key,bssid"
+);
+
+void _network_WLAN_disconnectMethod(PikaObj *self, Args *args){
+    _network_WLAN_disconnect(self);
+}
+method_typedef(
+    _network_WLAN_disconnect,
+    "disconnect", ""
+);
+
+void _network_WLAN_ifconfigMethod(PikaObj *self, Args *args){
+    char* ip = args_getStr(args, "ip");
+    char* mask = args_getStr(args, "mask");
+    char* gateway = args_getStr(args, "gateway");
+    char* dns = args_getStr(args, "dns");
+    _network_WLAN_ifconfig(self, ip, mask, gateway, dns);
+}
+method_typedef(
+    _network_WLAN_ifconfig,
+    "ifconfig", "ip,mask,gateway,dns"
+);
+
+void _network_WLAN_isconnectedMethod(PikaObj *self, Args *args){
+    int res = _network_WLAN_isconnected(self);
+    method_returnInt(args, res);
+}
+method_typedef(
+    _network_WLAN_isconnected,
+    "isconnected", ""
+);
+
+void _network_WLAN_scanMethod(PikaObj *self, Args *args){
+    PikaObj* res = _network_WLAN_scan(self);
+    method_returnObj(args, res);
+}
+method_typedef(
+    _network_WLAN_scan,
+    "scan", ""
+);
+
+void _network_WLAN_statusMethod(PikaObj *self, Args *args){
+    int res = _network_WLAN_status(self);
+    method_returnInt(args, res);
+}
+method_typedef(
+    _network_WLAN_status,
+    "status", ""
+);
+
+void _network_WLAN_statusWithParamMethod(PikaObj *self, Args *args){
+    char* param = args_getStr(args, "param");
+    int res = _network_WLAN_statusWithParam(self, param);
+    method_returnInt(args, res);
+}
+method_typedef(
+    _network_WLAN_statusWithParam,
+    "statusWithParam", "param"
+);
+
+class_def(_network_WLAN){
+    __BEFORE_MOETHOD_DEF
+    method_def(_network_WLAN_disconnect, 35797775),
+    method_def(_network_WLAN_isconnected, 122933684),
+    method_def(_network_WLAN_close, 255564379),
+    method_def(_network_WLAN_status, 478842185),
+    method_def(_network_WLAN_statusWithParam, 669129430),
+    method_def(_network_WLAN___init__, 904762485),
+    method_def(_network_WLAN_checkActive, 1083463551),
+    method_def(_network_WLAN_checkConfig, 1175746073),
+    method_def(_network_WLAN_connect, 1400262095),
+    method_def(_network_WLAN_checkIfconfig, 1489379336),
+    method_def(_network_WLAN_connectWithBssid, 1620729632),
+    method_def(_network_WLAN_active, 1902398945),
+    method_def(_network_WLAN_config, 1994681467),
+    method_def(_network_WLAN_scan, 2090717482),
+    method_def(_network_WLAN_ifconfig, 2104309482),
+};
+class_inhert(_network_WLAN, TinyObj);
+
+PikaObj *New__network_WLAN(Args *args){
+    PikaObj *self = New_TinyObj(args);
+    obj_setClass(self, _network_WLAN);
+    return self;
+}
+
+Arg *_network_WLAN(PikaObj *self){
+    return obj_newObjInPackage(New__network_WLAN);
 }
 #endif
 

@@ -7,3 +7,4 @@ socket==v0.1.4
 hashlib==v1.0.1
 hmac==v1.0.1
 base64==v1.0.0
+network==v0.1.2

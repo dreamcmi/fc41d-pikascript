@@ -423,6 +423,7 @@ file(GLOB pika_src
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/hmac/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/base64/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/FC41D/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/network/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pika_config.c
 )
 
@@ -438,6 +439,7 @@ list(APPEND pika_inc
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/hashlib
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/hmac
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/base64
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/network
 )
 
 add_library(pikascript-core STATIC)
