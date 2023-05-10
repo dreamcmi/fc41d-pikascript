@@ -38,6 +38,7 @@
         "sys.h": "c",
         "netdb.h": "c",
         "api.h": "c",
-        "sockets.h": "c"
+        "sockets.h": "c",
+        "ql_wlan.h": "c"
     }
 }

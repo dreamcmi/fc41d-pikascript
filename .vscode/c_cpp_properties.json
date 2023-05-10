@@ -7,7 +7,8 @@
                 "PIKA_CONFIG_ENABLE",
                 "PIKA_LWIP_ENABLE",
                 "CFG_OS_FREERTOS=1",
-                "WIFI_BLE_COEXIST"
+                "WIFI_BLE_COEXIST",
+                "PIKA_FREERTOS_ENABLE"
             ],
             "windowsSdkVersion": "10.0.19041.0",
             "compilerPath": "${workspaceFolder}/ql_tools/toolchain/gcc_arm_none_eabi/gcc-arm-none-eabi-5_4-2016q3-win32/bin/arm-none-eabi-gcc.exe",

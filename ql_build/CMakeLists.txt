@@ -443,7 +443,7 @@ list(APPEND pika_inc
 add_library(pikascript-core STATIC)
 target_sources(pikascript-core PRIVATE ${pika_src})
 target_include_directories(pikascript-core PUBLIC ${pika_inc})
-target_compile_definitions(pikascript-core PRIVATE PIKA_CONFIG_ENABLE PIKA_LWIP_ENABLE)
+target_compile_definitions(pikascript-core PRIVATE PIKA_CONFIG_ENABLE PIKA_LWIP_ENABLE PIKA_FREERTOS_ENABLE)
 
 add_executable(${target}
     ${kernel_app_source_file}
