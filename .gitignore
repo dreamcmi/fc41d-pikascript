@@ -2,6 +2,4 @@ ql_tools/toolchain/gcc_arm_none_eabi/gcc-arm-none-eabi-9-2019-q4-major/
 ql_out/
 ql_build/build/
 ql_tools/bk_writer_V1.62/bk_writer.ini
-ql_application/pikascript/pikascript-api/__asset_pikaModules_py_a.c
-ql_application/pikascript/pikascript-api/*.o
-ql_application/pikascript/pikascript-api/pikaModules.py.a
+ql_application/pikascript/pikascript-api/*
