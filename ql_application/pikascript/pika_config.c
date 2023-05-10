@@ -27,7 +27,6 @@ int __platform_putchar(char ch) {
     ql_uart_write(QL_UART_PORT_2, str, 1);
 }
 
-
 void __platform_sleep_ms(uint32_t ms) {
     ql_rtos_task_sleep_ms((uint32_t)ms);
 }
@@ -80,8 +79,12 @@ void __platform_enable_irq_handle(void) {
     ql_rtos_enter_critical();
 }
 
-char __platform_getchar(void) {
-    unsigned char buff[1] = {0};
-    ql_uart_read(QL_UART_PORT_2, buff, 1);
-    return *buff;
+char pika_platform_getchar() {
+    char buff[1] = {0};
+    int err = -1;
+    while (err != 0) {
+        err = ql_uart_read(QL_UART_PORT_2, (unsigned char*)buff, 1);
+        vTaskDelay(1);
+    }
+    return buff[0];
 }
