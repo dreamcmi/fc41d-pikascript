@@ -14,20 +14,15 @@ static volatile PIKA_BOOL wifi_sta_connected = PIKA_FALSE;
 static volatile PIKA_HAL_WIFI_STATUS wifi_sta_disconn_reason =
     PIKA_HAL_WIFI_STATUS_IDLE;
 static volatile ql_wlanInterface_Typedef_e wlan_mode = QL_STATION;
+static ql_network_InitTypeDef_s wifi_config = {0};
 
 static void wlan_status(ql_wlan_evt_type* ctxt) {
-    ql_LinkStatusTypeDef_s linkStatus = {0};
     switch (*ctxt) {
         case QL_WLAN_EVT_STA_IDLE:
             wifi_sta_disconn_reason = PIKA_HAL_WIFI_STATUS_IDLE;
             break;
         case QL_WLAN_EVT_STA_CONNECTED:
             wifi_sta_disconn_reason = PIKA_HAL_WIFI_STATUS_CONNECTING;
-            ql_wlan_get_link_status(&linkStatus);
-            ql_wlan_log("[D]sta:rssi=%d,ssid=%s,bssid=" MACSTR
-                        ",channel=%d,cipher_type:",
-                        linkStatus.wifi_strength, linkStatus.ssid,
-                        MAC2STR(linkStatus.bssid), linkStatus.channel);
             break;
         case QL_WLAN_EVT_STA_CONNECT_FAILED:
             wifi_sta_disconn_reason = PIKA_HAL_WIFI_STATUS_CONNECT_FAIL;
@@ -88,8 +83,6 @@ int pika_hal_platform_WIFI_ioctl_enable(pika_dev* dev) {
         pika_platform_printf("Error: unknow mode enable:%d\r\n", cfg->mode);
         return -1;
     }
-
-    pika_debug("regist event handler");
     return ql_wlan_status_register_cb(wlan_status);
 }
 
@@ -102,8 +95,9 @@ int pika_hal_platform_WIFI_ioctl_disable(pika_dev* dev) {
         }
         wifi_started = PIKA_FALSE;
         return 0;
+    } else {
+        return -1;
     }
-    return -1;
 }
 
 int pika_hal_platform_WIFI_ioctl_others(pika_dev* dev,
@@ -121,26 +115,46 @@ int pika_hal_platform_WIFI_ioctl_others(pika_dev* dev,
         return -1;
     }
     if (cmd == PIKA_HAL_IOCTL_WIFI_CONNECT) {
-        ql_network_InitTypeDef_s wNetConfig = {0};
         pika_hal_WIFI_connect_config* conncfg =
             (pika_hal_WIFI_connect_config*)arg;
 
-        os_strcpy((char*)wNetConfig.wifi_ssid, conncfg->ssid);
-        os_strcpy((char*)wNetConfig.wifi_key, conncfg->password);
-        wNetConfig.wifi_mode = QL_STATION;
-        wNetConfig.dhcp_mode = DHCP_CLIENT;
-        wNetConfig.wifi_retry_interval = 100;
-        if (ql_wlan_start(&wNetConfig) == 0) {
+        if (os_strlen(conncfg->ssid) > SSID_MAX_LEN) {
+            pika_platform_printf("Error: SSID LEN > 32\r\n");
+            return -1;
+        }
+        os_strcpy((char*)wifi_config.wifi_ssid, conncfg->ssid);
+        os_strcpy((char*)wifi_config.wifi_key, conncfg->password);
+        wifi_config.wifi_mode = QL_STATION;
+        wifi_config.dhcp_mode = DHCP_CLIENT;
+        wifi_config.wifi_retry_interval = 100;
+        if (ql_wlan_start(&wifi_config) == 0) {
             wifi_started = PIKA_TRUE;
             return 0;
+        } else {
+            return -1;
         }
-        return -1;
     }
     if (cmd == PIKA_HAL_IOCTL_WIFI_GET_IFCONFIG) {
-        return -1;
+        pika_hal_WIFI_ifconfig* hal_if = (pika_hal_WIFI_ifconfig*)arg;
+        ql_IPStatusTypedef_s ip_status = {0};
+        int err = ql_wlan_get_ip_status(&ip_status, wlan_mode);
+        if (err == 0) {
+            os_memcpy(hal_if->ip, ip_status.ip, 16);
+            os_memcpy(hal_if->gateway, ip_status.gate, 16);
+            os_memcpy(hal_if->netmask, ip_status.mask, 16);
+            os_memcpy(hal_if->dns, ip_status.dns, 16);
+            return 0;
+        } else {
+            return -1;
+        }
     }
     if (cmd == PIKA_HAL_IOCTL_WIFI_SET_IFCONFIG) {
-        return -1;
+        pika_hal_WIFI_ifconfig* hal_if = (pika_hal_WIFI_ifconfig*)arg;
+        os_memcpy(wifi_config.local_ip_addr, hal_if->ip, 16);
+        os_memcpy(wifi_config.gateway_ip_addr, hal_if->gateway, 16);
+        os_memcpy(wifi_config.net_mask, hal_if->netmask, 16);
+        os_memcpy(wifi_config.dns_server_ip_addr, hal_if->dns, 16);
+        return 0;
     }
     return -1;
 }
