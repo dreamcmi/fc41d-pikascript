@@ -1,9 +1,9 @@
-pikascript-core==latest
-PikaStdLib==latest
-PikaStdDevice==latest
-time==latest
-pika_libc==v1.0.1
-socket==latest
+pikascript-core==v1.12.2
+PikaStdLib==v1.12.2
+PikaStdDevice==v2.3.7
+time==v0.1.5
+pika_libc==v1.0.2
+socket==v0.1.4
 hashlib==v1.0.1
 hmac==v1.0.1
 base64==v1.0.0

@@ -17,7 +17,7 @@ class MemChecker:
 
 class SysObj:
     @staticmethod
-    def int(arg: any) -> int: ...
+    def int(arg: any, *base) -> int: ...
 
     @staticmethod
     def bool(arg: any) -> bool: ...
@@ -124,11 +124,31 @@ class SysObj:
 
     @staticmethod
     @PIKA_C_MACRO_IF("!PIKA_NANO_ENABLE")
+    def abs(val: any) -> any: ...
+
+    @staticmethod
+    @PIKA_C_MACRO_IF("!PIKA_NANO_ENABLE")
+    def max(*val) -> any: ...
+
+    @staticmethod
+    @PIKA_C_MACRO_IF("!PIKA_NANO_ENABLE")
+    def min(*val) -> any: ...
+
+    @staticmethod
+    @PIKA_C_MACRO_IF("!PIKA_NANO_ENABLE")
     def help(name: str): ...
 
     @staticmethod
     @PIKA_C_MACRO_IF("!PIKA_NANO_ENABLE")
     def reboot(): ...
+
+    @staticmethod
+    @PIKA_C_MACRO_IF("!PIKA_NANO_ENABLE")
+    def clear(): ...
+
+    @staticmethod
+    @PIKA_C_MACRO_IF("PIKA_GC_MARK_SWEEP_ENABLE")
+    def gcdump(): ...
 
 
 @PIKA_C_MACRO_IF("0")

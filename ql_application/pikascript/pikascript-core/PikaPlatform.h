@@ -1,6 +1,6 @@
 ﻿/*
- * This file is part of the PikaScript project.
- * http://github.com/pikastech/pikascript
+ * This file is part of the PikaPython project.
+ * http://github.com/pikastech/pikapython
  *
  * MIT License
  *
@@ -24,6 +24,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* adapter for old api */
 #include "./pika_adapter_old_api.h"
@@ -45,10 +48,11 @@
     #define pika_assert(expr) \
     if(!(expr)) { \
         pika_platform_printf((char*)"Assertion \"%s\" failed, in function: %s(). \r\n  (at %s:%d)\n", #expr, __FUNCTION__, __FILE__, __LINE__); \
+        pika_platform_abort_handler(); \
         abort(); \
     }
 #else
-    #define pika_assert(...)
+    #define pika_assert(...) (void)0;
 #endif
 /* clang-format on */
 
@@ -130,18 +134,20 @@ typedef enum {
 /* interrupt config */
 void pika_platform_enable_irq_handle(void);
 void pika_platform_disable_irq_handle(void);
+void pika_platform_abort_handler(void);
 
 /* printf family config */
 #ifndef pika_platform_printf
 void pika_platform_printf(char* fmt, ...);
 #endif
-int pika_platform_sprintf(char* buff, char* fmt, ...);
-int pika_platform_vsprintf(char* buff, char* fmt, va_list args);
+int pika_vprintf(char* fmt, va_list args);
+int pika_sprintf(char* buff, char* fmt, ...);
+int pika_vsprintf(char* buff, char* fmt, va_list args);
 int pika_platform_vsnprintf(char* buff,
                             size_t size,
                             const char* fmt,
                             va_list args);
-int pika_platform_snprintf(char* buff, size_t size, const char* fmt, ...);
+int pika_snprintf(char* buff, size_t size, const char* fmt, ...);
 char* pika_platform_strdup(const char* src);
 size_t pika_platform_tick_from_millisecond(size_t ms);
 
@@ -235,26 +241,21 @@ void pika_platform_thread_exit(pika_platform_thread_t* thread);
 
 #ifdef __linux
 #include <pthread.h>
-typedef struct pika_platform_thread_mutex {
-    pthread_mutex_t mutex;
-    volatile int is_init;
-    volatile int is_first_lock;
-} pika_platform_thread_mutex_t;
+typedef pthread_mutex_t pika_mutex_platform_data_t;
 #elif PIKA_FREERTOS_ENABLE
 #include "FreeRTOS.h"
 #include "semphr.h"
-typedef struct pika_platform_thread_mutex {
-    SemaphoreHandle_t mutex;
-    volatile int is_init;
-    volatile int is_first_lock;
-} pika_platform_thread_mutex_t;
+typedef SemaphoreHandle_t pika_mutex_platform_data_t;
 #else
+typedef void* pika_mutex_platform_data_t;
+#endif
+
 typedef struct pika_platform_thread_mutex {
-    void* platform_data;
+    pika_mutex_platform_data_t mutex;
     volatile int is_init;
     volatile int is_first_lock;
+    volatile int lock_times;
 } pika_platform_thread_mutex_t;
-#endif
 
 int pika_platform_thread_mutex_init(pika_platform_thread_mutex_t* m);
 int pika_platform_thread_mutex_lock(pika_platform_thread_mutex_t* m);
@@ -287,10 +288,15 @@ int pika_platform_thread_timer_remain(pika_platform_timer_t* timer);
 unsigned long pika_platform_thread_timer_now(void);
 void pika_platform_thread_timer_usleep(unsigned long usec);
 void pika_platform_reboot(void);
+void pika_platform_clear(void);
 
 #define WEAK_FUNCTION_NEED_OVERRIDE_ERROR(_)                               \
     pika_platform_printf("Error: weak function `%s()` need override.\r\n", \
                          __FUNCTION__);                                    \
     pika_platform_panic_handle();
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

@@ -39,7 +39,7 @@ class List(Tuple):
     def reverse(self):
         """reverse the list"""
 
-    def pop(self) -> any:
+    def pop(self, *index) -> any:
         """pop the last element"""
 
     def remove(self, val: any):
@@ -134,6 +134,8 @@ class String:
     def replace(self, old: str, new: str) -> str: ...
     def strip(self, *chrs) -> str: ...
     def format(self, *vars) -> str: ...
+    def join(self, val: any) -> str: ...
+    def find(self, sub: str) -> int: ...
 
 
 class ByteArray:

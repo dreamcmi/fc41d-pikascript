@@ -1,6 +1,6 @@
 /*
  * This file is part of the PikaScript project.
- * http://github.com/pikastech/pikascript
+ * http://github.com/pikastech/pikapython
  *
  * MIT License
  *
@@ -24,6 +24,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef __PIKA_VM__H
 #define __PIKA_VM__H
@@ -35,10 +38,12 @@
 #include <setjmp.h>
 #endif
 
-enum Instruct {
+enum InstructIndex {
 #define __INS_ENUM
 #include "__instruction_table.h"
-    __INSTRCUTION_CNT,
+    __INSTRUCTION_CNT,
+    __INSTRUCTION_INDEX_MAX = 0xFFFF,
+    __INSTRUCTION_UNKNOWN = 0xFFFF,
 };
 
 typedef enum {
@@ -81,9 +86,8 @@ struct VMState {
     uint32_t ins_cnt;
     PIKA_BOOL in_super;
     uint8_t super_invoke_deepth;
-    PikaObj* lreg[PIKA_REGIST_SIZE];
-    PIKA_BOOL ireg[PIKA_REGIST_SIZE];
     RunState* run_state;
+    PIKA_BOOL ireg[PIKA_REGIST_SIZE];
 };
 
 typedef struct {
@@ -150,7 +154,31 @@ struct VMSignal {
 #if PIKA_EVENT_ENABLE
     EventCQ cq;
     int event_pickup_cnt;
+    int event_thread_inited;
 #endif
+};
+
+typedef Arg* (*VM_instruct_handler)(PikaObj* self,
+                                    VMState* vm,
+                                    char* data,
+                                    Arg* arg_ret_reg);
+
+typedef struct VMInstruction VMInstruction;
+struct VMInstruction {
+    VM_instruct_handler handler;
+    const char* op_str;
+    uint16_t op_idx;
+    uint16_t op_str_len : 4;
+    uint16_t : 12;
+};
+
+typedef struct VMInstructionSet VMInstructionSet;
+struct VMInstructionSet {
+    const VMInstruction* instructions;
+    uint16_t count;
+    uint16_t signature;
+    uint16_t op_idx_start;
+    uint16_t op_idx_end;
 };
 
 VMParameters* pikaVM_run(PikaObj* self, char* pyLine);
@@ -166,8 +194,9 @@ static inline int instructUnit_getInvokeDeepth(InstructUnit* self) {
     return self->deepth >> 4;
 }
 
-static inline enum Instruct instructUnit_getInstruct(InstructUnit* self) {
-    return (enum Instruct)(self->isNewLine_instruct & 0x7F);
+static inline enum InstructIndex instructUnit_getInstructIndex(
+    InstructUnit* self) {
+    return (enum InstructIndex)(self->isNewLine_instruct & 0x7F);
 }
 
 static inline int instructUnit_getConstPoolIndex(InstructUnit* self) {
@@ -201,7 +230,7 @@ static inline void instructUnit_setIsNewLine(InstructUnit* self, int val) {
 InstructUnit* New_instructUnit(uint8_t data_size);
 void instructUnit_deinit(InstructUnit* self);
 
-enum Instruct pikaVM_getInstructFromAsm(char* line);
+enum InstructIndex pikaVM_getInstructFromAsm(char* line);
 
 void constPool_init(ConstPool* self);
 void constPool_deinit(ConstPool* self);
@@ -285,8 +314,19 @@ void instructArray_printAsArray(InstructArray* self);
 void byteCodeFrame_loadByteCode(ByteCodeFrame* self, uint8_t* bytes);
 void byteCodeFrame_printAsArray(ByteCodeFrame* self);
 void byteCodeFrame_init(ByteCodeFrame* self);
+PIKA_BOOL pikaVM_registerInstructionSet(VMInstructionSet* ins_set);
 VMParameters* pikaVM_runByteCode(PikaObj* self, const uint8_t* bytecode);
 VMParameters* pikaVM_runByteCodeInconstant(PikaObj* self, uint8_t* bytecode);
+Arg* pikaVM_runByteCodeReturn(PikaObj* self,
+                              const uint8_t* bytecode,
+                              char* returnName);
+Arg* _do_pikaVM_runByteCodeReturn(PikaObj* self,
+                                  VMParameters* locals,
+                                  VMParameters* globals,
+                                  uint8_t* bytecode,
+                                  RunState* run_state,
+                                  PIKA_BOOL is_const_bytecode,
+                                  char* return_name);
 InstructUnit* instructArray_getNow(InstructArray* self);
 InstructUnit* instructArray_getNext(InstructArray* self);
 VMParameters* pikaVM_runSingleFile(PikaObj* self, char* filename);
@@ -308,7 +348,7 @@ VMParameters* _do_pikaVM_runByteCode(PikaObj* self,
 void _do_byteCodeFrame_loadByteCode(ByteCodeFrame* self,
                                     uint8_t* bytes,
                                     PIKA_BOOL is_const);
-Arg* __vm_get(VMState* vm, PikaObj* self, Arg* key, Arg* obj);
+Arg* _vm_get(VMState* vm, PikaObj* self, Arg* key, Arg* obj);
 void __vm_List_append(PikaObj* self, Arg* arg);
 void __vm_List___init__(PikaObj* self);
 void __vm_Dict_set(PikaObj* self, Arg* arg, char* key);
@@ -324,8 +364,19 @@ PIKA_RES __eventListener_pushEvent(PikaEventListener* lisener,
                                    uint32_t eventId,
                                    Arg* eventData);
 int _VMEvent_getVMCnt(void);
-void _VMEvent_pickupEvent(void);
+void __VMEvent_pickupEvent(char* info);
 void _pikaVM_yield(void);
 int _VM_lock_init(void);
 int _VM_is_first_lock(void);
+
+#define _VMEvent_pickupEvent() __VMEvent_pickupEvent(__FILE__)
+
+typedef struct {
+    PikaObj* lreg[PIKA_REGIST_SIZE];
+} VMLocals;
+
+#endif
+
+#ifdef __cplusplus
+}
 #endif
