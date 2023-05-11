@@ -65,8 +65,13 @@ int pika_hal_platform_WIFI_ioctl_config(pika_dev* dev,
             pika_platform_printf("Error: STA mode not support config\r\n");
             return -1;
         case PIKA_HAL_WIFI_MODE_AP:
-            pika_platform_printf("Error: AP mode not support config\r\n");
-            return -1;
+            wifi_config.wifi_mode = QL_SOFT_AP;
+            wifi_config.dhcp_mode = DHCP_SERVER;
+            wifi_config.wifi_retry_interval = 100;
+            os_strcpy(wifi_config.wifi_ssid, cfg->ap_ssid);
+            os_strcpy(wifi_config.wifi_key, cfg->ap_password);
+            ql_wlan_set_channel(cfg->channel);
+            return ql_wlan_start(&wifi_config);
         default:
             pika_platform_printf("Error: unknow mode config:%d\r\n", cfg->mode);
             return -1;
