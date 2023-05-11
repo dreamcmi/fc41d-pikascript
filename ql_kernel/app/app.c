@@ -819,7 +819,7 @@ void app_start(void)
     app_pre_start();
 
 #if (CFG_OS_FREERTOS) || (CFG_SUPPORT_LITEOS)
-    cli_init();
+    // cli_init();
 #endif
 
 #if CFG_UDISK_MP3
