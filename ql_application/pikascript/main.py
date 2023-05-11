@@ -1,6 +1,5 @@
 import PikaStdLib
 import PikaStdDevice as std
-# import FC41D
 import socket
 import hashlib
 import hmac
@@ -8,6 +7,11 @@ import base64
 import time
 import network
 import _thread
+import json
+import requests
+import mqtt
+import aes
+import binascii
 
 mem = PikaStdLib.MemChecker()
 
@@ -28,22 +32,22 @@ def cb1(signal):
 
 G1.setCallBack(cb1, G1.SIGNAL_RISING)
 
-def task1():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.connect("AR300M-NOR", "goodlife")
-    while wlan.isconnected() == 0:
-        time.sleep_ms(100)
-    wlan.ifconfig()
-    while True:
-        mem.now()
-        time.sleep_ms(1000)
+# def task1():
+    # wlan = network.WLAN(network.STA_IF)
+    # wlan.active(True)
+    # wlan.connect("AR300M-NOR", "goodlife")
+    # while wlan.isconnected() == 0:
+    #     time.sleep_ms(100)
+    # wlan.ifconfig()
+    # while True:
+    #     mem.now()
+    #     time.sleep_ms(1000)
 
 
-_thread.start_new_thread(task1, ())
+# _thread.start_new_thread(task1, ())
 
-while 1:
-    time.sleep(1)
+# while 1:
+#     time.sleep(1)
 
 #################
 # print("socket test begin")

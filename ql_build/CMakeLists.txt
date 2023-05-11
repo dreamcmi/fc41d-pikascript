@@ -425,6 +425,11 @@ file(GLOB pika_src
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/FC41D/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/network/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/_thread/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/aes/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/binascii/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/pika_cjson/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/mqtt/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/requests/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pika_config.c
 )
 
@@ -442,6 +447,11 @@ list(APPEND pika_inc
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/base64
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/network
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/_thread
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/aes
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/binascii
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/pika_cjson
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/mqtt
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/requests
 )
 
 add_library(pikascript-core STATIC)
@@ -456,7 +466,7 @@ add_executable(${target}
     ${kernel_app_source_file}
     ${quectel_demo_source_file}
     ${mbedtls_source_file}       #ql_components_mbedtls_source_files
-    ${paho_mqtt_source_file}
+    # ${paho_mqtt_source_file}
 )
 target_link_libraries(${target} PRIVATE  -Wl,--whole-archive pikascript-core  -Wl,--no-whole-archive)
 set_target_properties(${target} PROPERTIES OUTPUT_NAME "${target}.elf")
