@@ -8,3 +8,4 @@ hashlib==v1.0.1
 hmac==v1.0.1
 base64==v1.0.0
 network==v0.1.2
+_thread==v0.0.4

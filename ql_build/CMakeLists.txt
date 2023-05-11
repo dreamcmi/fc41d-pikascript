@@ -424,6 +424,7 @@ file(GLOB pika_src
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/base64/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/FC41D/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/network/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/_thread/*.c
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pika_config.c
 )
 
@@ -440,12 +441,16 @@ list(APPEND pika_inc
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/hmac
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/base64
         ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/network
+        ${CMAKE_CURRENT_LIST_DIR}/../ql_application/pikascript/pikascript-lib/_thread
 )
 
 add_library(pikascript-core STATIC)
 target_sources(pikascript-core PRIVATE ${pika_src})
 target_include_directories(pikascript-core PUBLIC ${pika_inc})
-target_compile_definitions(pikascript-core PRIVATE PIKA_CONFIG_ENABLE PIKA_LWIP_ENABLE PIKA_FREERTOS_ENABLE)
+target_compile_definitions(pikascript-core PRIVATE 
+                            PIKA_CONFIG_ENABLE 
+                            PIKA_LWIP_ENABLE 
+                            PIKA_FREERTOS_ENABLE)
 
 add_executable(${target}
     ${kernel_app_source_file}
