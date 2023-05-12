@@ -61,7 +61,7 @@ char pika_platform_getchar() {
     return buff[0];
 }
 
-int __fmodeflags(const char* mode) {
+static int __lfs_fmodeflags(const char* mode) {
     int flags;
     if (strchr(mode, '+'))
         flags = LFS_O_RDWR;
@@ -78,7 +78,7 @@ int __fmodeflags(const char* mode) {
 
 FILE* pika_platform_fopen(const char* filename, const char* modes) {
     lfs_file_t* _pika_lfs_file = os_malloc(sizeof(lfs_file_t));
-    int mode = __fmodeflags(modes);
+    int mode = __lfs_fmodeflags(modes);
     if (lfs_file_open(&lfs_flash, _pika_lfs_file, filename, mode) ==
         LFS_ERR_OK) {
         return (FILE*)_pika_lfs_file;
