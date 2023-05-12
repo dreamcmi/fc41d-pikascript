@@ -10,7 +10,7 @@
 #define ql_flash_log               os_null_printf
 #endif
 
-#define TEST_FLASH_LEN  256
+#define TEST_FLASH_LEN  892
 #define TEST_FLASH_ADDR  0x132000
 
 typedef enum

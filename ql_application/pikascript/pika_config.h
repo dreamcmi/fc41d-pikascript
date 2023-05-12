@@ -9,7 +9,6 @@
 #include "uart_pub.h"
 #include "ql_api_osi.h"
 #include "os.h"
-
-// #define __platform_printf(...) os_printf(__VA_ARGS__)
+#include "lfs_port.h"
 
 #endif

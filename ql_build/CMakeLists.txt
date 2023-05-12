@@ -72,6 +72,8 @@ list(APPEND include_files
     ${CMAKE_CURRENT_LIST_DIR}/../ql_components/mbedtls/mbedtls_ui
     ${CMAKE_CURRENT_LIST_DIR}/../ql_components/mbedtls/mbedtls-port/inc
 
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_components/littlefs
+
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/tcp_client
     ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/tcp_server
@@ -282,7 +284,7 @@ list(APPEND quectel_demo_source_file
     # ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_spi_demo.c
     # ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_pwm_demo.c
     # ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_gpio_demo.c
-    # ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_flash_demo.c
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_flash_demo.c
     # ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_adc_demo.c
     # ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_lowpower_demo.c
     # ${CMAKE_CURRENT_LIST_DIR}/../ql_application/quectel_demo/ql_ble_config_network_demo.c
@@ -407,6 +409,13 @@ list(APPEND paho_mqtt_source_file
     ${CMAKE_CURRENT_LIST_DIR}/../ql_components/paho-mqtt/mqtt_ui/mqtt_client_com_port.c
 )
 
+list(APPEND littelfs_source_file
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_components/littlefs/lfs_util.c
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_components/littlefs/lfs.c
+    ${CMAKE_CURRENT_LIST_DIR}/../ql_components/littlefs/lfs_port.c
+)
+
+
 include_directories(BEFORE  ${include_files} ${ble_include_file})
 
 #add_library(driver)
@@ -467,6 +476,7 @@ add_executable(${target}
     ${quectel_demo_source_file}
     ${mbedtls_source_file}       #ql_components_mbedtls_source_files
     # ${paho_mqtt_source_file}
+    ${littelfs_source_file}
 )
 target_link_libraries(${target} PRIVATE  -Wl,--whole-archive pikascript-core  -Wl,--no-whole-archive)
 set_target_properties(${target} PROPERTIES OUTPUT_NAME "${target}.elf")

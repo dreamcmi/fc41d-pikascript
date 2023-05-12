@@ -39,6 +39,11 @@
         "netdb.h": "c",
         "api.h": "c",
         "sockets.h": "c",
-        "ql_wlan.h": "c"
+        "ql_wlan.h": "c",
+        "pikamain.h": "c",
+        "assert.h": "c",
+        "array": "c",
+        "string": "c",
+        "lfs_port.h": "c"
     }
 }
