@@ -7,5 +7,6 @@
 extern lfs_t lfs_flash;
 
 int lfs_ll_mount();
+int lfs_ls(lfs_t* lfs, const char* path);
 
 #endif

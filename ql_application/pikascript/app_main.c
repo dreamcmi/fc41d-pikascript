@@ -31,6 +31,13 @@
 
 static ql_task_t pika_thread_handle = NULL;
 
+void print_task_list() {
+    char InfoBuffer[512] = {0};
+    vTaskList((char*)&InfoBuffer);
+    os_printf("任务名      任务状态 优先级   剩余栈 任务序号\r\n");
+    os_printf("\r\n%s\r\n", InfoBuffer);
+}
+
 static void pika_thread() {
     os_printf("pika_thread entry\r\n");
     ql_adc_thread_init();
@@ -44,6 +51,9 @@ static void pika_thread() {
     lfs_file_rewind(&lfs_flash, &file);
     lfs_file_write(&lfs_flash, &file, lines, sizeof(lines));
     lfs_file_close(&lfs_flash, &file);
+
+    lfs_ls(&lfs_flash, "/");
+    print_task_list();
 
     os_printf("\r\npika entry\r\n");
     PikaObj* pikaMain = newRootObj("pikaMain", New_PikaMain);
