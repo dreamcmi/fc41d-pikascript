@@ -40,7 +40,7 @@
 
 #define DEBUG_PRT_MAX_CNT          (16)
 
-#define RX_RB_LENGTH               (128)  // 64
+#define RX_RB_LENGTH               (4096)  // 64
 #define TX_RB_LENGTH               (64)
 
 #define CARRIAGE_RETURN(buf, count) \
@@ -63,10 +63,10 @@
 
 #define UART_BAUD_RATE               UART_BAUDRATE_115200
 #ifndef UART1_BAUD_RATE
-#define UART1_BAUD_RATE              UART_BAUD_RATE
+#define UART1_BAUD_RATE              UART_BAUDRATE_921600
 #endif
 #ifndef UART2_BAUD_RATE
-#define UART2_BAUD_RATE              UART_BAUD_RATE
+#define UART2_BAUD_RATE              UART_BAUDRATE_921600
 #endif
 
 #ifndef UART1_USE_FIFO_REC
