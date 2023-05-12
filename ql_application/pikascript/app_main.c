@@ -45,16 +45,13 @@ static void pika_thread() {
     lfs_file_write(&lfs_flash, &file, lines, sizeof(lines));
     lfs_file_close(&lfs_flash, &file);
 
-    os_printf("pika entry\r\n");
-
-    // pikaScriptShell(pikaScriptInit());
-
+    os_printf("\r\npika entry\r\n");
     PikaObj* pikaMain = newRootObj("pikaMain", New_PikaMain);
     extern unsigned char pikaModules_py_a[];
     obj_linkLibrary(pikaMain, pikaModules_py_a);
     pikaScriptShell(pikaMain);
     obj_deinit(pikaMain);
-    os_printf("pika run end\r\n");
+    os_printf("\r\npika run end\r\n");
 
     while (1) {
         ql_rtos_task_sleep_ms(1000);
@@ -65,7 +62,7 @@ void ql_demo_main() {
     int ret;
     os_printf("demo test start \n");
 
-    ret = ql_rtos_task_create(&pika_thread_handle, 8192,
+    ret = ql_rtos_task_create(&pika_thread_handle, 16384,
                               THD_EXTENDED_APP_PRIORITY, "pikascript",
                               pika_thread, 0);
 
