@@ -56,9 +56,12 @@ char pika_platform_getchar() {
     int err = -1;
     while (err != 0) {
         err = ql_uart_read(QL_UART_PORT_2, (unsigned char*)buff, 1);
+        if (err == 0) {
+            return buff[0];
+        }
         vTaskDelay(1);
     }
-    return buff[0];
+    // return buff[0];
 }
 
 static int __lfs_fmodeflags(const char* mode) {
