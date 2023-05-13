@@ -65,18 +65,20 @@ char pika_platform_getchar() {
 }
 
 static int __lfs_fmodeflags(const char* mode) {
-    int flags;
-    if (strchr(mode, '+'))
-        flags = LFS_O_RDWR;
-    else if (*mode == 'r')
-        flags = LFS_O_RDONLY;
-    else
-        flags = LFS_O_WRONLY;
-    if (*mode == 'w')
-        flags |= LFS_O_TRUNC;
-    if (*mode == 'a')
-        flags |= LFS_O_APPEND;
-    return flags;
+    int flag = 0;
+    if (strstr(mode, "w")) {
+        flag |= LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC;
+    }
+    if (strstr(mode, "r")) {
+        flag |= LFS_O_RDONLY;
+    }
+    if (strstr(mode, "a")) {
+        flag |= LFS_O_WRONLY | LFS_O_CREAT | LFS_O_APPEND;
+    }
+    if (strstr(mode, "+")) {
+        flag |= LFS_O_RDWR;
+    }
+    return flag;
 }
 
 FILE* pika_platform_fopen(const char* filename, const char* modes) {
